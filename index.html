@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>餐厅开业筹备甘特图</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --kimi-color-text-primary: #1a1a1a;
+  --kimi-color-text-secondary: #666666;
+  --kimi-color-text-tertiary: #999999;
+  --kimi-color-text-quaternary: #bbbbbb;
+  --kimi-color-surface: #ffffff;
+  --kimi-color-surface-muted: #f5f5f5;
+  --kimi-color-surface-raised: #fafafa;
+  --kimi-color-surface-strong: #eeeeee;
+  --kimi-color-border: #e0e0e0;
+  --kimi-color-danger: #e53935;
+  --kimi-color-positive: #43a047;
+  --kimi-color-warning: #f5a623;
+  --kimi-color-accent: #1976d2;
+  --kimi-chart-1: #1976d2;
+  --kimi-chart-2: #e53935;
+  --kimi-chart-3: #43a047;
+  --kimi-chart-4: #7e57c2;
+  --kimi-chart-5: #9e9e9e;
+  --kimi-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --t-fast: 120ms;
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --kimi-color-text-primary: #f0f0f0;
+    --kimi-color-text-secondary: #aaaaaa;
+    --kimi-color-text-tertiary: #777777;
+    --kimi-color-text-quaternary: #555555;
+    --kimi-color-surface: #1a1a1a;
+    --kimi-color-surface-muted: #2a2a2a;
+    --kimi-color-surface-raised: #333333;
+    --kimi-color-surface-strong: #444444;
+    --kimi-color-border: #444444;
+    --kimi-color-danger: #ef5350;
+    --kimi-color-positive: #66bb6a;
+    --kimi-color-warning: #ffa726;
+    --kimi-color-accent: #42a5f5;
+    --kimi-chart-1: #42a5f5;
+    --kimi-chart-2: #ef5350;
+    --kimi-chart-3: #66bb6a;
+    --kimi-chart-4: #ab47bc;
+    --kimi-chart-5: #bdbdbd;
+  }
+}
+body {
+  font-family: var(--kimi-font-sans);
+  color: var(--kimi-color-text-primary);
+  background: var(--kimi-color-surface);
+  overflow: hidden;
+  height: 100vh;
+}
+.gantt-app { display: flex; flex-direction: column; height: 100vh; }
+.gantt-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--kimi-color-border); flex-shrink: 0; }
+.gantt-title { font-size: 18px; font-weight: 500; }
+.gantt-subtitle { font-size: 13px; color: var(--kimi-color-text-tertiary); margin-top: 2px; }
+.gantt-actions { display: flex; gap: 8px; align-items: center; }
+.gantt-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--kimi-color-border); background: var(--kimi-color-surface); cursor: pointer; font-size: 13px; transition: all var(--t-fast) var(--ease-out); }
+.gantt-btn:hover { background: var(--kimi-color-surface-raised); }
+.gantt-btn.primary { background: var(--kimi-color-text-primary); color: var(--kimi-color-surface); border-color: var(--kimi-color-text-primary); }
+.gantt-btn.primary:hover { opacity: 0.9; }
+.gantt-btn.success { background: var(--kimi-color-positive); color: #fff; border-color: var(--kimi-color-positive); }
+.gantt-btn.success:hover { opacity: 0.9; }
+.gantt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.gantt-legend { display: flex; gap: 12px; font-size: 12px; }
+.gantt-legend-item { display: flex; align-items: center; gap: 4px; }
+.gantt-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.gantt-body { display: flex; flex: 1; overflow: hidden; }
+.gantt-task-col { width: 520px; flex-shrink: 0; border-right: 1px solid var(--kimi-color-border); overflow-y: auto; }
+.gantt-task-header { height: 40px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 500; color: var(--kimi-color-text-secondary); border-bottom: 1px solid var(--kimi-color-border); background: var(--kimi-color-surface-muted); }
+.gantt-task-group { border-bottom: 1px solid var(--kimi-color-border); }
+.gantt-task-row { height: 44px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; cursor: pointer; transition: background var(--t-fast) var(--ease-out); user-select: none; }
+.gantt-task-row:hover { background: var(--kimi-color-surface-raised); }
+.gantt-task-row.active { background: color-mix(in srgb, var(--kimi-color-accent) 8%, transparent); }
+.gantt-task-row .expand-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; margin-right: 6px; font-size: 11px; color: var(--kimi-color-text-tertiary); transition: transform var(--t-fast) var(--ease-out); flex-shrink: 0; cursor: pointer; }
+.gantt-task-row .expand-icon.expanded { transform: rotate(90deg); }
+.gantt-task-row .task-cat { width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; flex-shrink: 0; }
+.gantt-task-row .task-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gantt-task-row .task-progress { font-size: 11px; color: var(--kimi-color-text-quaternary); margin-left: 4px; flex-shrink: 0; }
+.gantt-task-row .task-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; flex-shrink: 0; }
+.gantt-subtask-list { display: none; padding-left: 32px; padding-bottom: 6px; }
+.gantt-subtask-list.open { display: block; }
+
+.gantt-subtask-row { display: flex; align-items: center; padding: 5px 12px 5px 0; font-size: 13px; border-radius: 6px; gap: 6px; }
+.gantt-subtask-row:hover { background: var(--kimi-color-surface-raised); }
+.gantt-subtask-row .sub-check { width: 16px; height: 16px; border: 1.5px solid var(--kimi-color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all var(--t-fast) var(--ease-out); }
+.gantt-subtask-row .sub-check.checked { background: var(--kimi-color-text-primary); border-color: var(--kimi-color-text-primary); }
+.gantt-subtask-row .sub-check.checked::after { content: "✓"; color: var(--kimi-color-surface); font-size: 10px; font-weight: 600; }
+.gantt-subtask-row .sub-name { flex: 1; color: var(--kimi-color-text-secondary); cursor: text; padding: 2px 4px; border-radius: 4px; transition: background var(--t-fast); min-width: 0; }
+.gantt-subtask-row .sub-name:hover { background: var(--kimi-color-surface-muted); }
+.gantt-subtask-row .sub-name.done { color: var(--kimi-color-text-quaternary); text-decoration: line-through; }
+.gantt-subtask-row .sub-name.editing { background: var(--kimi-color-surface-raised); outline: 1px solid var(--kimi-color-accent); color: var(--kimi-color-text-primary); text-decoration: none; }
+.gantt-subtask-row .sub-del { opacity: 0; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-size: 12px; color: var(--kimi-color-text-quaternary); flex-shrink: 0; transition: all var(--t-fast); }
+.gantt-subtask-row:hover .sub-del { opacity: 1; }
+.gantt-subtask-row .sub-del:hover { background: color-mix(in srgb, var(--kimi-color-danger) 12%, transparent); color: var(--kimi-color-danger); }
+.gantt-subtask-add { display: flex; align-items: center; padding: 4px 12px 4px 34px; font-size: 13px; color: var(--kimi-color-text-quaternary); cursor: pointer; border-radius: 6px; margin-right: 12px; transition: all var(--t-fast); }
+.gantt-subtask-add:hover { color: var(--kimi-color-text-primary); background: var(--kimi-color-surface-raised); }
+.gantt-subtask-add .add-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; margin-right: 6px; font-size: 14px; }
+
+.proc-table { margin: 4px 12px 8px 32px; border: 1px solid var(--kimi-color-border); border-radius: 8px; overflow: hidden; }
+.proc-table-header { display: grid; grid-template-columns: 28px 1fr 60px 70px 70px 28px 28px 20px; gap: 4px; padding: 6px 8px; background: var(--kimi-color-surface-muted); font-size: 11px; color: var(--kimi-color-text-secondary); font-weight: 500; border-bottom: 1px solid var(--kimi-color-border); }
+.proc-table-row { display: grid; grid-template-columns: 28px 1fr 60px 70px 70px 28px 28px 20px; gap: 4px; padding: 5px 8px; font-size: 12px; border-bottom: 1px solid var(--kimi-color-border); align-items: center; transition: background var(--t-fast); }
+.proc-table-row:last-child { border-bottom: none; }
+.proc-table-row:hover { background: var(--kimi-color-surface-raised); }
+.proc-table-row .pt-check { width: 16px; height: 16px; border: 1.5px solid var(--kimi-color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--t-fast); }
+.proc-table-row .pt-check.checked { background: var(--kimi-color-text-primary); border-color: var(--kimi-color-text-primary); }
+.proc-table-row .pt-check.checked::after { content: "✓"; color: var(--kimi-color-surface); font-size: 10px; font-weight: 600; }
+.proc-table-row .pt-cell { padding: 2px 4px; border-radius: 4px; cursor: text; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proc-table-row .pt-cell:hover { background: var(--kimi-color-surface-muted); }
+.proc-table-row .pt-cell.editing { background: var(--kimi-color-surface-raised); outline: 1px solid var(--kimi-color-accent); }
+.proc-table-row .pt-cell.num { text-align: right; font-variant-numeric: tabular-nums; }
+.proc-table-row .pt-ship, .proc-table-row .pt-arrive { width: 16px; height: 16px; border: 1.5px solid var(--kimi-color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--t-fast); }
+.proc-table-row .pt-ship.shipped { background: color-mix(in srgb, var(--kimi-color-warning) 20%, transparent); border-color: var(--kimi-color-warning); }
+.proc-table-row .pt-ship.shipped::after { content: "📦"; font-size: 9px; }
+.proc-table-row .pt-arrive.arrived { background: color-mix(in srgb, var(--kimi-color-positive) 20%, transparent); border-color: var(--kimi-color-positive); }
+.proc-table-row .pt-arrive.arrived::after { content: "✓"; color: var(--kimi-color-positive); font-size: 10px; font-weight: 600; }
+.proc-table-row .pt-del { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-size: 12px; color: var(--kimi-color-text-quaternary); opacity: 0; transition: all var(--t-fast); }
+.proc-table-row:hover .pt-del { opacity: 1; }
+.proc-table-row .pt-del:hover { background: color-mix(in srgb, var(--kimi-color-danger) 12%, transparent); color: var(--kimi-color-danger); }
+.proc-table-add { display: flex; align-items: center; padding: 6px 8px; font-size: 12px; color: var(--kimi-color-text-quaternary); cursor: pointer; background: var(--kimi-color-surface-muted); transition: all var(--t-fast); }
+.proc-table-add:hover { color: var(--kimi-color-text-primary); background: var(--kimi-color-surface-raised); }
+.proc-table-add .add-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; margin-right: 6px; font-size: 14px; }
+
+.gantt-chart-area { flex: 1; overflow: auto; position: relative; }
+.gantt-chart-header { height: 40px; display: flex; border-bottom: 1px solid var(--kimi-color-border); background: var(--kimi-color-surface-muted); position: sticky; top: 0; z-index: 5; }
+.gantt-day-cell { width: 36px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--kimi-color-text-secondary); border-right: 1px solid var(--kimi-color-border); flex-shrink: 0; }
+.gantt-day-cell.weekend { background: color-mix(in srgb, var(--kimi-color-surface-muted) 70%, transparent); color: var(--kimi-color-text-quaternary); }
+.gantt-day-cell.today { background: color-mix(in srgb, var(--kimi-color-accent) 12%, transparent); color: var(--kimi-color-accent); font-weight: 500; }
+.gantt-chart-rows { position: relative; }
+.gantt-chart-group { border-bottom: 1px solid var(--kimi-color-border); }
+.gantt-chart-row { height: 44px; position: relative; }
+.gantt-chart-subrows { display: none; }
+.gantt-chart-subrows.open { display: block; }
+.gantt-chart-subrow { height: 32px; position: relative; border-bottom: 1px dashed var(--kimi-color-border); }
+.gantt-bar { position: absolute; height: 24px; top: 10px; border-radius: 6px; font-size: 11px; display: flex; align-items: center; padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.gantt-bar:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.1); z-index: 10; }
+.gantt-bar .bar-text { color: #fff; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.gantt-bar .bar-progress { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(255,255,255,0.25); border-radius: 6px 0 0 6px; transition: width var(--t-fast) var(--ease-out); }
+.gantt-today-line { position: absolute; top: 40px; bottom: 0; width: 2px; background: var(--kimi-color-accent); z-index: 4; pointer-events: none; }
+.gantt-today-label { position: absolute; top: 42px; font-size: 10px; color: var(--kimi-color-accent); background: var(--kimi-color-surface); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--kimi-color-accent); z-index: 4; }
+.gantt-grid-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; pointer-events: none; }
+.gantt-grid-col { width: 36px; border-right: 1px solid var(--kimi-color-border); flex-shrink: 0; }
+.gantt-grid-col.weekend { background: color-mix(in srgb, var(--kimi-color-surface-muted) 50%, transparent); }
+.gantt-detail-panel { position: absolute; right: 16px; top: 16px; width: 280px; background: var(--kimi-color-surface-raised); border: 1px solid var(--kimi-color-border); border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 20; display: none; }
+.gantt-detail-panel.show { display: block; }
+.gantt-detail-title { font-size: 15px; font-weight: 500; margin-bottom: 12px; }
+.gantt-detail-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+.gantt-detail-label { color: var(--kimi-color-text-secondary); }
+.gantt-detail-value { color: var(--kimi-color-text-primary); font-weight: 500; }
+.gantt-detail-desc { font-size: 13px; color: var(--kimi-color-text-secondary); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--kimi-color-border); line-height: 1.5; }
+.gantt-detail-close { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--kimi-color-text-tertiary); font-size: 16px; }
+.gantt-detail-close:hover { background: var(--kimi-color-surface-muted); color: var(--kimi-color-text-primary); }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--kimi-color-text-primary); color: var(--kimi-color-surface); padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 100; opacity: 0; transition: all 300ms var(--ease-out); pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.settings-panel { position: fixed; top: 0; right: 0; width: 360px; height: 100vh; background: var(--kimi-color-surface-raised); border-left: 1px solid var(--kimi-color-border); z-index: 200; transform: translateX(100%); transition: transform 300ms var(--ease-out); padding: 24px; overflow-y: auto; }
+.settings-panel.open { transform: translateX(0); }
+.settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 199; opacity: 0; pointer-events: none; transition: opacity 300ms; }
+.settings-overlay.open { opacity: 1; pointer-events: auto; }
+.settings-title { font-size: 18px; font-weight: 500; margin-bottom: 20px; }
+.settings-group { margin-bottom: 20px; }
+.settings-label { font-size: 13px; color: var(--kimi-color-text-secondary); margin-bottom: 6px; display: block; }
+.settings-input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--kimi-color-border); background: var(--kimi-color-surface); font-size: 13px; font-family: inherit; color: var(--kimi-color-text-primary); }
+.settings-input:focus { outline: none; border-color: var(--kimi-color-accent); }
+.settings-hint { font-size: 11px; color: var(--kimi-color-text-quaternary); margin-top: 4px; line-height: 1.4; }
+.settings-actions { display: flex; gap: 8px; margin-top: 24px; }
+
+@media (max-width: 900px) {
+  .gantt-task-col { width: 100%; border-right: none; }
+  .gantt-body { flex-direction: column; }
+  .gantt-chart-area { height: 300px; }
+  .gantt-header { flex-wrap: wrap; gap: 8px; }
+  .gantt-actions { width: 100%; justify-content: flex-end; }
+  .settings-panel { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="gantt-app">
+<div class="gantt-header">
+  <div>
+    <div class="gantt-title">餐厅开业筹备甘特图</div>
+    <div class="gantt-subtitle">目标开业日：2026年10月1日 | 倒计时 <span id="countdown"></span> 天 | 数据自动保存到浏览器</div>
+  </div>
+  <div class="gantt-actions">
+    <button class="gantt-btn" onclick="openSettings()">⚙️ 设置</button>
+    <button class="gantt-btn" onclick="resetData()">🔄 重置</button>
+    <button class="gantt-btn primary" onclick="exportHTML()">⬇️ 导出</button>
+    <button class="gantt-btn success" id="syncBtn" onclick="syncToGitHub()">🚀 同步到GitHub</button>
+  </div>
+</div>
+<div class="gantt-body">
+  <div class="gantt-task-col">
+    <div class="gantt-task-header">任务名称</div>
+    <div id="task-list"></div>
+  </div>
+  <div class="gantt-chart-area" id="chart-area">
+    <div class="gantt-chart-header" id="chart-header"></div>
+    <div class="gantt-chart-rows" id="chart-rows">
+      <div class="gantt-grid-bg" id="grid-bg"></div>
+      <div class="gantt-today-line" id="today-line"></div>
+      <div class="gantt-today-label" id="today-label">今天</div>
+      <div id="bars-container"></div>
+    </div>
+    <div class="gantt-detail-panel" id="detail-panel">
+      <button class="gantt-detail-close" onclick="closeDetail()">×</button>
+      <div class="gantt-detail-title" id="detail-title"></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">分类</span><span class="gantt-detail-value" id="detail-cat"></span></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">负责人</span><span class="gantt-detail-value" id="detail-owner"></span></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">开始日期</span><span class="gantt-detail-value" id="detail-start"></span></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">结束日期</span><span class="gantt-detail-value" id="detail-end"></span></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">持续天数</span><span class="gantt-detail-value" id="detail-duration"></span></div>
+      <div class="gantt-detail-row"><span class="gantt-detail-label">完成进度</span><span class="gantt-detail-value" id="detail-progress"></span></div>
+      <div class="gantt-detail-desc" id="detail-desc"></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-title">GitHub 同步设置</div>
+  <div class="settings-group">
+    <label class="settings-label">GitHub Personal Access Token</label>
+    <input class="settings-input" type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="settings-hint">在 GitHub Settings → Developer settings → Personal access tokens → Tokens (classic) 生成，勾选 repo 权限</div>
+  </div>
+  <div class="settings-group">
+    <label class="settings-label">仓库所有者（用户名）</label>
+    <input class="settings-input" type="text" id="ghOwner" placeholder="hwxue1222" value="hwxue1222">
+  </div>
+  <div class="settings-group">
+    <label class="settings-label">仓库名</label>
+    <input class="settings-input" type="text" id="ghRepo" placeholder="opening" value="opening">
+  </div>
+  <div class="settings-group">
+    <label class="settings-label">分支名</label>
+    <input class="settings-input" type="text" id="ghBranch" placeholder="main" value="main">
+  </div>
+  <div class="settings-group">
+    <label class="settings-label">文件路径</label>
+    <input class="settings-input" type="text" id="ghPath" placeholder="index.html" value="index.html">
+  </div>
+  <div class="settings-actions">
+    <button class="gantt-btn" onclick="closeSettings()">取消</button>
+    <button class="gantt-btn primary" onclick="saveSettings()">保存设置</button>
+  </div>
+  <div class="settings-hint" style="margin-top:20px;">设置保存在浏览器中，不会上传到服务器。<br>Token 只用于通过 GitHub API 更新你的仓库文件。</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const OPENING_DATE = new Date('2026-10-01');
+const START_DATE = new Date('2026-08-01');
+const DAY_WIDTH = 36;
+const STORAGE_KEY = 'restaurant_gantt_data_v1';
+const SETTINGS_KEY = 'restaurant_gantt_settings_v1';
+
+const CAT_COLORS = {
+  '证照': 'var(--kimi-chart-1)',
+  '装修': 'var(--kimi-chart-2)',
+  '采购': 'var(--kimi-chart-3)',
+  '人员': 'var(--kimi-chart-4)',
+  '营销': 'var(--kimi-chart-5)'
+};
+
+const STATUS_STYLES = {
+  '未开始': { bg: 'var(--kimi-color-surface-muted)', text: 'var(--kimi-color-text-tertiary)' },
+  '进行中': { bg: 'color-mix(in srgb, var(--kimi-color-accent) 12%, transparent)', text: 'var(--kimi-color-accent)' },
+  '已完成': { bg: 'color-mix(in srgb, var(--kimi-color-positive) 12%, transparent)', text: 'var(--kimi-color-positive)' },
+  '延期': { bg: 'color-mix(in srgb, var(--kimi-color-danger) 12%, transparent)', text: 'var(--kimi-color-danger)' }
+};
+
+const DEFAULT_TASKS = [{"id":1,"name":"营业执照申请","cat":"证照","owner":"店长","start":"2026-08-01","days":14,"desc":"准备材料：身份证、场地租赁合同、消防验收证明，向市场监管局提交申请。","isProcurement":false,"subtasks":[{"name":"准备身份证复印件","done":true},{"name":"准备场地租赁合同","done":true},{"name":"填写申请表格","done":true},{"name":"提交市场监管局","done":true},{"name":"领取营业执照","done":false}]},{"id":2,"name":"食品经营许可证","cat":"证照","owner":"店长","start":"2026-08-05","days":20,"desc":"需先完成营业执照，提交厨房布局图、食品安全管理制度、从业人员健康证。","isProcurement":false,"subtasks":[{"name":"绘制厨房布局图","done":true},{"name":"制定食品安全管理制度","done":true},{"name":"办理从业人员健康证","done":false},{"name":"提交申请材料","done":false},{"name":"现场核查","done":false},{"name":"领取许可证","done":false}]},{"id":3,"name":"消防验收","cat":"证照","owner":"工程部","start":"2026-08-10","days":10,"desc":"装修前需消防设计备案，装修后申请消防验收。","isProcurement":false,"subtasks":[{"name":"消防设计备案","done":true},{"name":"安装消防设备","done":true},{"name":"疏散通道验收","done":false},{"name":"灭火器配置检查","done":false},{"name":"取得消防验收合格证明","done":false}]},{"id":4,"name":"环保排污许可","cat":"证照","owner":"店长","start":"2026-08-15","days":12,"desc":"安装油烟净化器和隔油池，向环保局提交排污申请。","isProcurement":false,"subtasks":[{"name":"安装油烟净化器","done":false},{"name":"安装隔油池","done":false},{"name":"提交排污申请","done":false},{"name":"现场检查","done":false},{"name":"取得排污许可证","done":false}]},{"id":5,"name":"开业验收","cat":"证照","owner":"店长","start":"2026-09-15","days":10,"desc":"开业前最终验收，包括卫生、消防、食品安全等综合检查，确保符合开业条件。","isProcurement":false,"subtasks":[{"name":"卫生部门现场检查","done":false},{"name":"消防最终复查","done":false},{"name":"食品安全综合核查","done":false},{"name":"整改不合格项","done":false},{"name":"取得开业许可","done":false}]},{"id":6,"name":"场地设计与测量","cat":"装修","owner":"设计师","start":"2026-08-01","days":7,"desc":"量房、出平面布局图、水电点位图、效果图确认。","isProcurement":false,"subtasks":[{"name":"现场量房","done":true},{"name":"平面布局图","done":true},{"name":"水电点位图","done":true},{"name":"效果图确认","done":true}]},{"id":7,"name":"水电改造","cat":"装修","owner":"施工队","start":"2026-08-08","days":10,"desc":"厨房大功率电路、上下水、排烟管道预埋。","isProcurement":false,"subtasks":[{"name":"电路布线","done":true},{"name":"上下水安装","done":true},{"name":"排烟管道预埋","done":true},{"name":"隐蔽工程验收","done":true}]},{"id":8,"name":"厨房设备安装","cat":"装修","owner":"施工队","start":"2026-08-18","days":12,"desc":"灶台、蒸柜、烤箱、冷藏柜、排烟罩等固定设备安装。","isProcurement":false,"subtasks":[{"name":"灶台安装","done":true},{"name":"蒸柜/烤箱就位","done":false},{"name":"冷藏柜安装","done":false},{"name":"排烟罩吊装","done":false},{"name":"设备通电调试","done":false}]},{"id":9,"name":"前厅装修","cat":"装修","owner":"施工队","start":"2026-08-20","days":25,"desc":"墙面、地面、吊顶、灯光、桌椅摆放、收银台制作。","isProcurement":false,"subtasks":[{"name":"墙面处理","done":true},{"name":"地面铺装","done":true},{"name":"吊顶安装","done":false},{"name":"灯光布置","done":false},{"name":"收银台制作","done":false},{"name":"桌椅进场摆放","done":false},{"name":"软装布置","done":false}]},{"id":10,"name":"厨房设备采购","cat":"采购","owner":"采购部","start":"2026-08-01","days":20,"desc":"炉灶、蒸箱、烤箱、冰箱、洗碗机、排烟系统等大型设备下单。","isProcurement":true,"subtasks":[{"name":"商用燃气灶台","qty":"2台","budget":"¥8,000","payment":"50%预付","shipped":true,"arrived":true,"done":true},{"name":"蒸柜","qty":"1台","budget":"¥5,000","payment":"全款","shipped":true,"arrived":true,"done":true},{"name":"烤箱","qty":"1台","budget":"¥6,500","payment":"50%预付","shipped":true,"arrived":false,"done":false},{"name":"四门冰箱","qty":"2台","budget":"¥7,000","payment":"货到付款","shipped":false,"arrived":false,"done":false},{"name":"洗碗机","qty":"1台","budget":"¥12,000","payment":"分期","shipped":false,"arrived":false,"done":false},{"name":"排烟系统","qty":"1套","budget":"¥15,000","payment":"50%预付","shipped":false,"arrived":false,"done":false}]},{"id":11,"name":"餐具器皿采购","cat":"采购","owner":"采购部","start":"2026-08-20","days":15,"desc":"碗碟、筷子、勺子、托盘、酒杯、茶壶等。","isProcurement":true,"subtasks":[{"name":"陶瓷碗碟套装","qty":"200套","budget":"¥4,000","payment":"全款","shipped":true,"arrived":true,"done":true},{"name":"筷子/勺子","qty":"300双","budget":"¥1,500","payment":"全款","shipped":true,"arrived":true,"done":true},{"name":"托盘","qty":"50个","budget":"¥800","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"酒杯","qty":"100个","budget":"¥1,200","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"茶壶/茶杯","qty":"30套","budget":"¥2,000","payment":"全款","shipped":false,"arrived":false,"done":false}]},{"id":12,"name":"食材供应商签约","cat":"采购","owner":"主厨","start":"2026-08-25","days":10,"desc":"肉类、蔬菜、海鲜、粮油、调料等供应商筛选、试样、签约。","isProcurement":true,"subtasks":[{"name":"肉类供应商","qty":"3家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false},{"name":"蔬菜供应商","qty":"2家","budget":"周结","payment":"周结","shipped":false,"arrived":false,"done":false},{"name":"海鲜供应商","qty":"2家","budget":"现结","payment":"现结","shipped":false,"arrived":false,"done":false},{"name":"粮油调料供应商","qty":"1家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false}]},{"id":13,"name":"POS系统与收银设备","cat":"采购","owner":"店长","start":"2026-09-01","days":7,"desc":"点餐系统、收银机、扫码枪、小票打印机、后厨KDS屏幕安装调试。","isProcurement":true,"subtasks":[{"name":"收银机","qty":"2台","budget":"¥6,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"扫码枪","qty":"2把","budget":"¥400","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"小票打印机","qty":"3台","budget":"¥900","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"后厨KDS屏幕","qty":"2台","budget":"¥3,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"点餐系统软件","qty":"1套","budget":"¥5,000/年","payment":"年付","shipped":false,"arrived":false,"done":false}]},{"id":14,"name":"店长/主厨招聘","cat":"人员","owner":"HR","start":"2026-08-01","days":21,"desc":"发布招聘、面试、背景调查、薪酬谈判、签约。","isProcurement":false,"subtasks":[{"name":"发布招聘信息","done":true},{"name":"简历筛选","done":true},{"name":"初试","done":true},{"name":"复试/试菜","done":true},{"name":"背景调查","done":true},{"name":"Offer发放","done":true},{"name":"签约入职","done":true}]},{"id":15,"name":"厨师团队招聘","cat":"人员","owner":"主厨","start":"2026-08-15","days":20,"desc":"热菜、凉菜、面点、切配等岗位招聘，主厨亲自面试试菜。","isProcurement":false,"subtasks":[{"name":"确定编制需求","done":true},{"name":"发布招聘","done":true},{"name":"简历筛选","done":false},{"name":"面试试菜","done":false},{"name":"录用签约","done":false}]},{"id":16,"name":"服务人员招聘","cat":"人员","owner":"店长","start":"2026-08-20","days":18,"desc":"服务员、传菜员、收银员、保洁员招聘。","isProcurement":false,"subtasks":[{"name":"确定招聘人数","done":true},{"name":"发布招聘","done":false},{"name":"面试筛选","done":false},{"name":"录用通知","done":false},{"name":"办理入职","done":false}]},{"id":17,"name":"全员培训","cat":"人员","owner":"店长","start":"2026-09-10","days":14,"desc":"服务流程、菜品知识、卫生标准、应急处理、POS系统操作培训。","isProcurement":false,"subtasks":[{"name":"制定培训计划","done":false},{"name":"服务礼仪培训","done":false},{"name":"菜品知识培训","done":false},{"name":"卫生标准培训","done":false},{"name":"POS系统操作培训","done":false},{"name":"应急演练","done":false},{"name":"考核通过","done":false}]},{"id":18,"name":"品牌VI设计","cat":"营销","owner":"市场部","start":"2026-08-01","days":14,"desc":"Logo、菜单设计、外卖包装、员工制服、店面招牌设计。","isProcurement":false,"subtasks":[{"name":"Logo设计定稿","done":true},{"name":"菜单设计","done":true},{"name":"外卖包装设计","done":true},{"name":"员工制服设计","done":true},{"name":"店面招牌设计","done":true}]},{"id":19,"name":"社交媒体预热","cat":"营销","owner":"市场部","start":"2026-09-01","days":20,"desc":"小红书、抖音、大众点评账号运营，发布装修进度、菜品预告。","isProcurement":false,"subtasks":[{"name":"注册各平台账号","done":false},{"name":"拍摄装修进度视频","done":false},{"name":"菜品预告拍摄","done":false},{"name":"发布预热内容","done":false},{"name":"互动引流","done":false}]},{"id":20,"name":"开业活动策划","cat":"营销","owner":"市场部","start":"2026-09-10","days":10,"desc":"试营业优惠、开业当天活动、会员招募方案、媒体邀请。","isProcurement":false,"subtasks":[{"name":"确定活动方案","done":false},{"name":"设计宣传物料","done":false},{"name":"联系媒体/KOL","done":false},{"name":"准备开业礼品","done":false}]},{"id":21,"name":"试营业","cat":"营销","owner":"店长","start":"2026-09-20","days":10,"desc":"邀请亲友试吃，检验出餐流程、服务动线、菜品口味，收集反馈调整。","isProcurement":false,"subtasks":[{"name":"确定试营业名单","done":false},{"name":"预约通知","done":false},{"name":"试营业执行","done":false},{"name":"收集反馈","done":false},{"name":"问题整改","done":false}]}];
+
+let expandedIds = new Set();
+let activeTaskId = null;
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    document.getElementById('ghToken').value = s.token || '';
+    document.getElementById('ghOwner').value = s.owner || 'hwxue1222';
+    document.getElementById('ghRepo').value = s.repo || 'opening';
+    document.getElementById('ghBranch').value = s.branch || 'main';
+    document.getElementById('ghPath').value = s.path || 'index.html';
+  } catch(e) {}
+}
+function saveSettings() {
+  const settings = {
+    token: document.getElementById('ghToken').value.trim(),
+    owner: document.getElementById('ghOwner').value.trim(),
+    repo: document.getElementById('ghRepo').value.trim(),
+    branch: document.getElementById('ghBranch').value.trim(),
+    path: document.getElementById('ghPath').value.trim()
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  closeSettings();
+  showToast('设置已保存');
+}
+function openSettings() {
+  loadSettings();
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+async function syncToGitHub() {
+  const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  if (!settings.token) {
+    showToast('请先点击「设置」配置 GitHub Token');
+    openSettings();
+    return;
+  }
+
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true;
+  btn.textContent = '🚀 同步中...';
+
+  try {
+    const apiUrl = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${settings.path}?ref=${settings.branch}`;
+    const getRes = await fetch(apiUrl, {
+      headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+
+    if (!getRes.ok) {
+      const err = await getRes.json();
+      throw new Error(err.message || '获取文件信息失败');
+    }
+
+    const fileInfo = await getRes.json();
+    const sha = fileInfo.sha;
+
+    const newHtml = buildExportHTML();
+    const content = btoa(unescape(encodeURIComponent(newHtml)));
+
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${settings.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Update progress ${new Date().toISOString().slice(0,10)}`,
+        content: content,
+        sha: sha,
+        branch: settings.branch
+      })
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json();
+      throw new Error(err.message || '更新失败');
+    }
+
+    showToast('✅ 同步成功！Vercel 将在1-2分钟后自动更新');
+
+  } catch (err) {
+    showToast('❌ 同步失败: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 同步到GitHub';
+  }
+}
+
+function buildExportHTML() {
+  let html = `<!DOCTYPE html>\n<html lang="zh-CN">\n` + document.documentElement.innerHTML + `\n</html>`;
+  const startMarker = 'const DEFAULT_TASKS = ';
+  const startIdx = html.indexOf(startMarker);
+  if (startIdx > -1) {
+    const endIdx = html.indexOf('];\n\nlet expandedIds', startIdx);
+    if (endIdx > -1) {
+      const newTasksJson = JSON.stringify(tasks);
+      html = html.substring(0, startIdx + startMarker.length) + newTasksJson + html.substring(endIdx + 1);
+    }
+  }
+  return html;
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.tasks && Array.isArray(parsed.tasks)) {
+        tasks = parsed.tasks;
+        if (parsed.expandedIds) expandedIds = new Set(parsed.expandedIds);
+        return;
+      }
+    }
+  } catch (e) {}
+  tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+}
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      tasks: tasks,
+      expandedIds: Array.from(expandedIds),
+      savedAt: new Date().toISOString()
+    }));
+  } catch (e) {}
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function resetData() {
+  if (confirm('确定重置所有数据到初始状态吗？当前修改将丢失。')) {
+    localStorage.removeItem(STORAGE_KEY);
+    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    expandedIds = new Set();
+    activeTaskId = null;
+    render();
+    showToast('数据已重置');
+  }
+}
+function exportHTML() {
+  const html = buildExportHTML();
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'restaurant_opening_gantt_' + new Date().toISOString().slice(0,10) + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已导出HTML文件');
+}
+
+function getDaysDiff(d1, d2) {
+  return Math.round((new Date(d2) - new Date(d1)) / (1000 * 60 * 60 * 24));
+}
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+function getTotalDays() {
+  return getDaysDiff(START_DATE, OPENING_DATE) + 5;
+}
+function isWeekend(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay();
+  return day === 0 || day === 6;
+}
+function isToday(dateStr) {
+  const today = new Date().toISOString().split('T')[0];
+  return dateStr === today;
+}
+function computeProgress(task) {
+  if (!task.subtasks || task.subtasks.length === 0) return 0;
+  const done = task.subtasks.filter(s => s.done).length;
+  return Math.round((done / task.subtasks.length) * 100);
+}
+function computeStatus(task) {
+  const p = computeProgress(task);
+  if (p === 0) return '未开始';
+  if (p === 100) return '已完成';
+  return '进行中';
+}
+
+function renderProcurementTable(task) {
+  const tid = task.id;
+  return `
+    <div class="proc-table">
+      <div class="proc-table-header">
+        <span></span><span>名称</span><span>数量</span><span>预算</span><span>付款</span>
+        <span title="出货">📦</span><span title="到货">✓</span><span></span>
+      </div>
+      ${task.subtasks.map((sub, si) => `
+        <div class="proc-table-row" data-tid="${tid}" data-sid="${si}">
+          <div class="pt-check ${sub.done ? 'checked' : ''}"></div>
+          <div class="pt-cell">${sub.name}</div>
+          <div class="pt-cell num">${sub.qty || '-'}</div>
+          <div class="pt-cell num">${sub.budget || '-'}</div>
+          <div class="pt-cell">${sub.payment || '-'}</div>
+          <div class="pt-ship ${sub.shipped ? 'shipped' : ''}"></div>
+          <div class="pt-arrive ${sub.arrived ? 'arrived' : ''}"></div>
+          <div class="pt-del" data-tid="${tid}" data-sid="${si}">×</div>
+        </div>
+      `).join('')}
+      <div class="proc-table-add" data-tid="${tid}">
+        <span class="add-icon">+</span><span>添加采购项</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderStandardSubtasks(task) {
+  const tid = task.id;
+  return `
+    ${task.subtasks.map((sub, si) => `
+      <div class="gantt-subtask-row" data-tid="${tid}" data-sid="${si}">
+        <div class="sub-check ${sub.done ? 'checked' : ''}"></div>
+        <span class="sub-name ${sub.done ? 'done' : ''}">${sub.name}</span>
+        <div class="sub-del" data-tid="${tid}" data-sid="${si}">×</div>
+      </div>
+    `).join('')}
+    <div class="gantt-subtask-add" data-tid="${tid}">
+      <span class="add-icon">+</span><span>添加子任务</span>
+    </div>
+  `;
+}
+
+function render() {
+  const totalDays = getTotalDays();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayOffset = getDaysDiff(START_DATE, todayStr);
+
+  const daysToOpen = getDaysDiff(todayStr, OPENING_DATE);
+  document.getElementById('countdown').textContent = daysToOpen > 0 ? daysToOpen : 0;
+
+  const headerEl = document.getElementById('chart-header');
+  let headerHTML = '';
+  let gridHTML = '';
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(START_DATE);
+    d.setDate(d.getDate() + i);
+    const ds = d.toISOString().split('T')[0];
+    const isWknd = isWeekend(ds);
+    const isTdy = isToday(ds);
+    const cls = isWknd ? 'weekend' : (isTdy ? 'today' : '');
+    headerHTML += `<div class="gantt-day-cell ${cls}">${d.getMonth() + 1}/${d.getDate()}</div>`;
+    gridHTML += `<div class="gantt-grid-col ${isWknd ? 'weekend' : ''}"></div>`;
+  }
+  headerEl.innerHTML = headerHTML;
+  document.getElementById('grid-bg').innerHTML = gridHTML;
+
+  const todayLine = document.getElementById('today-line');
+  const todayLabel = document.getElementById('today-label');
+  if (todayOffset >= 0 && todayOffset < totalDays) {
+    todayLine.style.left = (todayOffset * DAY_WIDTH + DAY_WIDTH / 2) + 'px';
+    todayLine.style.display = 'block';
+    todayLabel.style.left = (todayOffset * DAY_WIDTH + 4) + 'px';
+    todayLabel.style.display = 'block';
+  } else {
+    todayLine.style.display = 'none';
+    todayLabel.style.display = 'none';
+  }
+
+  const taskList = document.getElementById('task-list');
+  const barsContainer = document.getElementById('bars-container');
+
+  let taskHTML = '';
+  let barsHTML = '';
+
+  tasks.forEach(task => {
+    const isExpanded = expandedIds.has(task.id);
+    const progress = computeProgress(task);
+    const status = computeStatus(task);
+    const color = CAT_COLORS[task.cat] || 'var(--kimi-chart-1)';
+    const st = STATUS_STYLES[status];
+    const isActive = activeTaskId === task.id;
+
+    const offset = getDaysDiff(START_DATE, task.start);
+    const width = task.days * DAY_WIDTH;
+    const left = offset * DAY_WIDTH;
+
+    taskHTML += `
+      <div class="gantt-task-group">
+        <div class="gantt-task-row ${isActive ? 'active' : ''}" data-id="${task.id}">
+          <div class="expand-icon ${isExpanded ? 'expanded' : ''}">▶</div>
+          <div class="task-cat" style="background:${color}"></div>
+          <span class="task-name">${task.name}</span>
+          <span class="task-progress">${progress}%</span>
+          <span class="task-status" style="background:${st.bg}; color:${st.text}">${status}</span>
+        </div>
+        <div class="gantt-subtask-list ${isExpanded ? 'open' : ''}">
+          ${task.isProcurement ? renderProcurementTable(task) : renderStandardSubtasks(task)}
+        </div>
+      </div>
+    `;
+
+    barsHTML += `
+      <div class="gantt-chart-group">
+        <div class="gantt-chart-row">
+          <div class="gantt-bar" style="left:${left}px; width:${width}px; background:${color};">
+            <div class="bar-progress" style="width:${progress}%"></div>
+            <span class="bar-text">${task.name} ${progress > 0 ? progress + '%' : ''}</span>
+          </div>
+        </div>
+        <div class="gantt-chart-subrows ${isExpanded ? 'open' : ''}">
+          ${task.subtasks.map(() => `<div class="gantt-chart-subrow"></div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  taskList.innerHTML = taskHTML;
+  barsContainer.innerHTML = barsHTML;
+
+  document.querySelectorAll('.expand-icon').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(el.closest('.gantt-task-row').dataset.id);
+      if (expandedIds.has(id)) expandedIds.delete(id);
+      else expandedIds.add(id);
+      saveData();
+      render();
+    });
+  });
+
+  document.querySelectorAll('.gantt-subtask-row .sub-check').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const row = el.closest('.gantt-subtask-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks[sid].done = !task.subtasks[sid].done;
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.sub-name').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (el.isContentEditable) return;
+      const row = el.closest('.gantt-subtask-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      el.contentEditable = true;
+      el.classList.add('editing');
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      function save() {
+        const task = tasks.find(t => t.id === tid);
+        if (task) {
+          const newName = el.textContent.trim();
+          if (newName) task.subtasks[sid].name = newName;
+        }
+        el.contentEditable = false;
+        el.classList.remove('editing');
+        el.removeEventListener('blur', save);
+        el.removeEventListener('keydown', onKey);
+        saveData();
+        render();
+      }
+      function onKey(ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+        if (ev.key === 'Escape') {
+          const task = tasks.find(t => t.id === tid);
+          if (task) el.textContent = task.subtasks[sid].name;
+          el.contentEditable = false;
+          el.classList.remove('editing');
+          el.removeEventListener('blur', save);
+          el.removeEventListener('keydown', onKey);
+        }
+      }
+      el.addEventListener('blur', save);
+      el.addEventListener('keydown', onKey);
+    });
+  });
+
+  document.querySelectorAll('.sub-del').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tid = parseInt(el.dataset.tid);
+      const sid = parseInt(el.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task && task.subtasks.length > 1) {
+        task.subtasks.splice(sid, 1);
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.gantt-subtask-add').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tid = parseInt(el.dataset.tid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks.push({ name: "新子任务", done: false });
+        saveData();
+        render();
+        setTimeout(() => {
+          const rows = document.querySelectorAll('.gantt-subtask-row');
+          const last = rows[rows.length - 1];
+          if (last) last.querySelector('.sub-name').click();
+        }, 50);
+      }
+    });
+  });
+
+  document.querySelectorAll('.pt-check').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const row = el.closest('.proc-table-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks[sid].done = !task.subtasks[sid].done;
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.pt-ship').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const row = el.closest('.proc-table-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks[sid].shipped = !task.subtasks[sid].shipped;
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.pt-arrive').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const row = el.closest('.proc-table-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks[sid].arrived = !task.subtasks[sid].arrived;
+        if (task.subtasks[sid].arrived) task.subtasks[sid].done = true;
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.pt-cell').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (el.isContentEditable) return;
+      const row = el.closest('.proc-table-row');
+      const tid = parseInt(row.dataset.tid);
+      const sid = parseInt(row.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (!task) return;
+
+      el.contentEditable = true;
+      el.classList.add('editing');
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      function save() {
+        const newVal = el.textContent.trim();
+        if (newVal) {
+          const idx = Array.from(row.parentElement.children).indexOf(row) - 1;
+          const field = el === row.children[1] ? 'name' : (el === row.children[2] ? 'qty' : (el === row.children[3] ? 'budget' : 'payment'));
+          if (field === 'name') task.subtasks[sid].name = newVal;
+          else if (field === 'qty') task.subtasks[sid].qty = newVal;
+          else if (field === 'budget') task.subtasks[sid].budget = newVal;
+          else if (field === 'payment') task.subtasks[sid].payment = newVal;
+        }
+        el.contentEditable = false;
+        el.classList.remove('editing');
+        el.removeEventListener('blur', save);
+        el.removeEventListener('keydown', onKey);
+        saveData();
+        render();
+      }
+      function onKey(ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+        if (ev.key === 'Escape') {
+          el.contentEditable = false;
+          el.classList.remove('editing');
+          el.removeEventListener('blur', save);
+          el.removeEventListener('keydown', onKey);
+        }
+      }
+      el.addEventListener('blur', save);
+      el.addEventListener('keydown', onKey);
+    });
+  });
+
+  document.querySelectorAll('.pt-del').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tid = parseInt(el.dataset.tid);
+      const sid = parseInt(el.dataset.sid);
+      const task = tasks.find(t => t.id === tid);
+      if (task && task.subtasks.length > 1) {
+        task.subtasks.splice(sid, 1);
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.proc-table-add').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tid = parseInt(el.dataset.tid);
+      const task = tasks.find(t => t.id === tid);
+      if (task) {
+        task.subtasks.push({ name: "新采购项", qty: "", budget: "", payment: "", shipped: false, arrived: false, done: false });
+        saveData();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('.gantt-task-row, .gantt-bar').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.id);
+      activeTaskId = activeTaskId === id ? null : id;
+      render();
+      if (activeTaskId !== null) showDetail(activeTaskId);
+      else closeDetail();
+    });
+  });
+
+  document.getElementById('chart-rows').style.width = (totalDays * DAY_WIDTH) + 'px';
+}
+
+function showDetail(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const progress = computeProgress(task);
+  document.getElementById('detail-title').textContent = task.name;
+  document.getElementById('detail-cat').textContent = task.cat;
+  document.getElementById('detail-cat').style.color = CAT_COLORS[task.cat];
+  document.getElementById('detail-owner').textContent = task.owner;
+  document.getElementById('detail-start').textContent = task.start;
+  document.getElementById('detail-end').textContent = addDays(task.start, task.days);
+  document.getElementById('detail-duration').textContent = task.days + ' 天';
+  document.getElementById('detail-progress').textContent = progress + '%';
+  document.getElementById('detail-desc').textContent = task.desc;
+  document.getElementById('detail-panel').classList.add('show');
+}
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('show');
+  activeTaskId = null;
+  render();
+}
+
+loadSettings();
+loadData();
+render();
+</script>
+</body>
+</html>
