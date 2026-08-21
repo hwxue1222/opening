@@ -67,6 +67,9 @@ body {
 .gantt-btn:hover { background: var(--kimi-color-surface-raised); }
 .gantt-btn.primary { background: var(--kimi-color-text-primary); color: var(--kimi-color-surface); border-color: var(--kimi-color-text-primary); }
 .gantt-btn.primary:hover { opacity: 0.9; }
+.gantt-btn.success { background: var(--kimi-color-positive); color: #fff; border-color: var(--kimi-color-positive); }
+.gantt-btn.success:hover { opacity: 0.9; }
+.gantt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .gantt-legend { display: flex; gap: 12px; font-size: 12px; }
 .gantt-legend-item { display: flex; align-items: center; gap: 4px; }
 .gantt-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
@@ -159,12 +162,26 @@ body {
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--kimi-color-text-primary); color: var(--kimi-color-surface); padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 100; opacity: 0; transition: all 300ms var(--ease-out); pointer-events: none; }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+/* Settings Panel */
+.settings-panel { position: fixed; top: 0; right: 0; width: 360px; height: 100vh; background: var(--kimi-color-surface-raised); border-left: 1px solid var(--kimi-color-border); z-index: 200; transform: translateX(100%); transition: transform 300ms var(--ease-out); padding: 24px; overflow-y: auto; }
+.settings-panel.open { transform: translateX(0); }
+.settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 199; opacity: 0; pointer-events: none; transition: opacity 300ms; }
+.settings-overlay.open { opacity: 1; pointer-events: auto; }
+.settings-title { font-size: 18px; font-weight: 500; margin-bottom: 20px; }
+.settings-group { margin-bottom: 20px; }
+.settings-label { font-size: 13px; color: var(--kimi-color-text-secondary); margin-bottom: 6px; display: block; }
+.settings-input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--kimi-color-border); background: var(--kimi-color-surface); font-size: 13px; font-family: inherit; color: var(--kimi-color-text-primary); }
+.settings-input:focus { outline: none; border-color: var(--kimi-color-accent); }
+.settings-hint { font-size: 11px; color: var(--kimi-color-text-quaternary); margin-top: 4px; line-height: 1.4; }
+.settings-actions { display: flex; gap: 8px; margin-top: 24px; }
+
 @media (max-width: 900px) {
   .gantt-task-col { width: 100%; border-right: none; }
   .gantt-body { flex-direction: column; }
   .gantt-chart-area { height: 300px; }
   .gantt-header { flex-wrap: wrap; gap: 8px; }
   .gantt-actions { width: 100%; justify-content: flex-end; }
+  .settings-panel { width: 100%; }
 }
 </style>
 </head>
@@ -177,8 +194,10 @@ body {
     <div class="gantt-subtitle">目标开业日：2026年10月1日 | 倒计时 <span id="countdown"></span> 天 | 数据自动保存到浏览器</div>
   </div>
   <div class="gantt-actions">
-    <button class="gantt-btn" onclick="resetData()">🔄 重置数据</button>
-    <button class="gantt-btn primary" onclick="exportHTML()">⬇️ 导出HTML</button>
+    <button class="gantt-btn" onclick="openSettings()">⚙️ 设置</button>
+    <button class="gantt-btn" onclick="resetData()">🔄 重置</button>
+    <button class="gantt-btn primary" onclick="exportHTML()">⬇️ 导出</button>
+    <button class="gantt-btn success" id="syncBtn" onclick="syncToGitHub()">🚀 同步到GitHub</button>
   </div>
 </div>
 
@@ -210,6 +229,49 @@ body {
 </div>
 
 </div>
+
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-title">GitHub 同步设置</div>
+
+  <div class="settings-group">
+    <label class="settings-label">GitHub Personal Access Token</label>
+    <input class="settings-input" type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="settings-hint">在 GitHub Settings → Developer settings → Personal access tokens → Tokens (classic) 生成，勾选 repo 权限</div>
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">仓库所有者（用户名）</label>
+    <input class="settings-input" type="text" id="ghOwner" placeholder="hwxue1222" value="hwxue1222">
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">仓库名</label>
+    <input class="settings-input" type="text" id="ghRepo" placeholder="opening" value="opening">
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">分支名</label>
+    <input class="settings-input" type="text" id="ghBranch" placeholder="main" value="main">
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">文件路径</label>
+    <input class="settings-input" type="text" id="ghPath" placeholder="index.html" value="index.html">
+  </div>
+
+  <div class="settings-actions">
+    <button class="gantt-btn" onclick="closeSettings()">取消</button>
+    <button class="gantt-btn primary" onclick="saveSettings()">保存设置</button>
+  </div>
+
+  <div class="settings-hint" style="margin-top:20px;">
+    设置保存在浏览器中，不会上传到服务器。<br>
+    Token 只用于通过 GitHub API 更新你的仓库文件。
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -217,6 +279,7 @@ const OPENING_DATE = new Date('2026-10-01');
 const START_DATE = new Date('2026-08-01');
 const DAY_WIDTH = 36;
 const STORAGE_KEY = 'restaurant_gantt_data_v1';
+const SETTINGS_KEY = 'restaurant_gantt_settings_v1';
 
 const CAT_COLORS = {
   '证照': 'var(--kimi-chart-1)',
@@ -495,6 +558,130 @@ const DEFAULT_TASKS = [
 let expandedIds = new Set();
 let activeTaskId = null;
 
+// Settings
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    document.getElementById('ghToken').value = s.token || '';
+    document.getElementById('ghOwner').value = s.owner || 'hwxue1222';
+    document.getElementById('ghRepo').value = s.repo || 'opening';
+    document.getElementById('ghBranch').value = s.branch || 'main';
+    document.getElementById('ghPath').value = s.path || 'index.html';
+  } catch(e) {}
+}
+function saveSettings() {
+  const settings = {
+    token: document.getElementById('ghToken').value.trim(),
+    owner: document.getElementById('ghOwner').value.trim(),
+    repo: document.getElementById('ghRepo').value.trim(),
+    branch: document.getElementById('ghBranch').value.trim(),
+    path: document.getElementById('ghPath').value.trim()
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  closeSettings();
+  showToast('设置已保存');
+}
+function openSettings() {
+  loadSettings();
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+// GitHub Sync
+async function syncToGitHub() {
+  const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  if (!settings.token) {
+    showToast('请先点击「设置」配置 GitHub Token');
+    openSettings();
+    return;
+  }
+
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true;
+  btn.textContent = '🚀 同步中...';
+
+  try {
+    // 1. Get current file SHA
+    const apiUrl = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${settings.path}?ref=${settings.branch}`;
+    const getRes = await fetch(apiUrl, {
+      headers: { 'Authorization': `token ${settings.token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+
+    if (!getRes.ok) {
+      const err = await getRes.json();
+      throw new Error(err.message || '获取文件信息失败');
+    }
+
+    const fileInfo = await getRes.json();
+    const sha = fileInfo.sha;
+
+    // 2. Build new HTML with current data
+    const newHtml = buildExportHTML();
+    const content = btoa(unescape(encodeURIComponent(newHtml)));
+
+    // 3. Update file via API
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${settings.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Update progress ${new Date().toISOString().slice(0,10)}`,
+        content: content,
+        sha: sha,
+        branch: settings.branch
+      })
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json();
+      throw new Error(err.message || '更新失败');
+    }
+
+    showToast('✅ 同步成功！Vercel 将在1-2分钟后自动更新');
+
+  } catch (err) {
+    showToast('❌ 同步失败: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 同步到GitHub';
+  }
+}
+
+function buildExportHTML() {
+  // Replace DEFAULT_TASKS in the HTML source with current tasks
+  let html = `<!DOCTYPE html>
+<html lang="zh-CN">
+` + document.documentElement.innerHTML + `
+</html>`;
+
+  // We need to inject current tasks data into the HTML so next load uses it
+  // Find the DEFAULT_TASKS array and replace it
+  const tasksJson = JSON.stringify(tasks, null, 2);
+
+  // Simple string replacement - find DEFAULT_TASKS = [...] and replace
+  const startMarker = 'const DEFAULT_TASKS = ';
+  const startIdx = html.indexOf(startMarker);
+  if (startIdx > -1) {
+    const endIdx = html.indexOf('];
+
+let expandedIds', startIdx);
+    if (endIdx > -1) {
+      html = html.substring(0, startIdx + startMarker.length) + tasksJson + html.substring(endIdx + 1);
+    }
+  }
+
+  return html;
+}
+
+// Data
 function loadData() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -509,7 +696,6 @@ function loadData() {
   } catch (e) {}
   tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
 }
-
 function saveData() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -519,14 +705,12 @@ function saveData() {
     }));
   } catch (e) {}
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-
 function resetData() {
   if (confirm('确定重置所有数据到初始状态吗？当前修改将丢失。')) {
     localStorage.removeItem(STORAGE_KEY);
@@ -537,21 +721,19 @@ function resetData() {
     showToast('数据已重置');
   }
 }
-
 function exportHTML() {
-  const blob = new Blob([`<!DOCTYPE html>
-<html lang="zh-CN">
-` + document.documentElement.innerHTML + `
-</html>`], { type: 'text/html' });
+  const html = buildExportHTML();
+  const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = 'restaurant_opening_gantt_' + new Date().toISOString().slice(0,10) + '.html';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('已导出HTML文件，请上传到GitHub');
+  showToast('已导出HTML文件');
 }
 
+// Render functions
 function getDaysDiff(d1, d2) {
   return Math.round((new Date(d2) - new Date(d1)) / (1000 * 60 * 60 * 24));
 }
@@ -572,7 +754,6 @@ function isToday(dateStr) {
   const today = new Date().toISOString().split('T')[0];
   return dateStr === today;
 }
-
 function computeProgress(task) {
   if (!task.subtasks || task.subtasks.length === 0) return 0;
   const done = task.subtasks.filter(s => s.done).length;
@@ -584,7 +765,6 @@ function computeStatus(task) {
   if (p === 100) return '已完成';
   return '进行中';
 }
-
 function renderProcurementTable(task) {
   const tid = task.id;
   return `
@@ -618,7 +798,6 @@ function renderProcurementTable(task) {
     </div>
   `;
 }
-
 function renderStandardSubtasks(task) {
   const tid = task.id;
   return `
@@ -635,7 +814,6 @@ function renderStandardSubtasks(task) {
     </div>
   `;
 }
-
 function render() {
   const totalDays = getTotalDays();
   const todayStr = new Date().toISOString().split('T')[0];
@@ -980,13 +1158,13 @@ function showDetail(id) {
   document.getElementById('detail-desc').textContent = task.desc;
   document.getElementById('detail-panel').classList.add('show');
 }
-
 function closeDetail() {
   document.getElementById('detail-panel').classList.remove('show');
   activeTaskId = null;
   render();
 }
 
+loadSettings();
 loadData();
 render();
 </script>
