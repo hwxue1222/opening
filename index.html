@@ -505,7 +505,7 @@ function render() {
 
     barsHTML += '<div class="gantt-chart-group">' +
       '<div class="gantt-chart-row">' +
-      '<div class="gantt-bar" style="left:' + left + 'px;width:' + width + 'px;background:' + color + ';">' +
+      '<div class="gantt-bar" data-id="' + task.id + '" style="left:' + left + 'px;width:' + width + 'px;background:' + color + ';">'
       '<div class="bar-progress" style="width:' + progress + '%"></div>' +
       '<span class="bar-text">' + task.name + (progress > 0 ? ' ' + progress + '%' : '') + '</span>' +
       '</div></div>' +
