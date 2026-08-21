@@ -307,10 +307,10 @@ async function syncToGitHub() {
 }
 
 function buildExportHTML() {
-  let html = '<!DOCTYPE html>
+  let html = `<!DOCTYPE html>
 <html lang="zh-CN">
-' + document.documentElement.innerHTML + '
-</html>';
+${document.documentElement.innerHTML}
+</html>`;
   const oldJson = JSON.stringify(DEFAULT_TASKS);
   const newJson = JSON.stringify(tasks);
   html = html.replace(oldJson, newJson);
