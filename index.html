@@ -88,10 +88,12 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 .gantt-chart-subrows{display:none}
 .gantt-chart-subrows.open{display:block}
 .gantt-chart-subrow{height:32px;position:relative;border-bottom:1px dashed var(--kimi-color-border)}
-.gantt-bar{position:absolute;height:24px;top:10px;border-radius:6px;font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:transform var(--t-fast) var(--ease-out),box-shadow var(--t-fast) var(--ease-out);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.gantt-bar{position:absolute;height:24px;top:10px;border-radius:6px;font-size:11px;display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:transform var(--t-fast) var(--ease-out),box-shadow var(--t-fast) var(--ease-out);box-shadow:0 1px 2px rgba(0,0,0,.06);user-select:none}
 .gantt-bar:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.1);z-index:10}
 .gantt-bar .bar-text{color:#fff;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,.2)}
 .gantt-bar .bar-progress{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.25);border-radius:6px 0 0 6px;transition:width var(--t-fast) var(--ease-out)}
+.gantt-bar .resize-handle{position:absolute;right:0;top:0;bottom:0;width:10px;cursor:ew-resize;border-radius:0 6px 6px 0;z-index:2}
+.gantt-bar .resize-handle:hover{background:rgba(255,255,255,.2)}
 .gantt-today-line{position:absolute;top:40px;bottom:0;width:2px;background:var(--kimi-color-accent);z-index:4;pointer-events:none}
 .gantt-today-label{position:absolute;top:42px;font-size:10px;color:var(--kimi-color-accent);background:var(--kimi-color-surface);padding:1px 4px;border-radius:3px;border:1px solid var(--kimi-color-accent);z-index:4}
 .gantt-grid-bg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;pointer-events:none}
@@ -119,6 +121,7 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 .settings-input:focus{outline:none;border-color:var(--kimi-color-accent)}
 .settings-hint{font-size:11px;color:var(--kimi-color-text-quaternary);margin-top:4px;line-height:1.4}
 .settings-actions{display:flex;gap:8px;margin-top:24px}
+.gantt-drag-tooltip{position:fixed;background:var(--kimi-color-text-primary);color:var(--kimi-color-surface);padding:4px 10px;border-radius:6px;font-size:12px;z-index:1000;pointer-events:none;display:none;white-space:nowrap;font-family:var(--kimi-font-sans);box-shadow:0 2px 8px rgba(0,0,0,.15)}
 @media (max-width:900px){.gantt-task-col{width:100%;border-right:none}.gantt-body{flex-direction:column}.gantt-chart-area{height:300px}.gantt-header{flex-wrap:wrap;gap:8px}.gantt-actions{width:100%;justify-content:flex-end}.settings-panel{width:100%}}
 </style>
 </head>
@@ -229,6 +232,86 @@ const DEFAULT_TASKS = [{"id":1,"name":"营业执照申请","cat":"证照","owner
 let tasks = [];
 let expandedIds = new Set();
 let activeTaskId = null;
+
+// ===== 拖拽状态 =====
+let isDragging = false;
+let dragMode = null;
+let dragTaskId = null;
+let dragStartX = 0;
+let dragStartLeft = 0;
+let dragStartWidth = 0;
+let dragStartDate = '';
+let dragStartDays = 0;
+let tooltipEl = null;
+
+function getDragTooltip() {
+  if (!tooltipEl) {
+    tooltipEl = document.createElement('div');
+    tooltipEl.className = 'gantt-drag-tooltip';
+    document.body.appendChild(tooltipEl);
+  }
+  return tooltipEl;
+}
+function updateDragTooltip(e, start, days) {
+  const tt = getDragTooltip();
+  const end = addDays(start, days);
+  if (dragMode === 'move') {
+    tt.textContent = start + ' → ' + end;
+  } else {
+    tt.textContent = start + ' | 持续 ' + days + ' 天';
+  }
+  tt.style.left = (e.clientX + 12) + 'px';
+  tt.style.top = (e.clientY - 36) + 'px';
+  tt.style.display = 'block';
+}
+function hideDragTooltip() {
+  const tt = getDragTooltip();
+  if (tt) tt.style.display = 'none';
+}
+
+// 全局拖拽事件（只绑定一次）
+document.addEventListener('mousemove', function(e) {
+  if (!isDragging || !dragTaskId) return;
+  e.preventDefault();
+  const task = tasks.find(function(t) { return t.id === dragTaskId; });
+  if (!task) return;
+  const bar = document.querySelector('.gantt-bar[data-id="' + dragTaskId + '"]');
+  if (!bar) return;
+  const dx = e.clientX - dragStartX;
+  if (dragMode === 'move') {
+    const newLeft = dragStartLeft + dx;
+    const newOffset = Math.round(newLeft / DAY_WIDTH);
+    const newStart = addDays(START_DATE.toISOString().split('T')[0], newOffset);
+    bar.style.left = newLeft + 'px';
+    updateDragTooltip(e, newStart, dragStartDays);
+  } else {
+    const newWidth = Math.max(DAY_WIDTH, dragStartWidth + dx);
+    const newDays = Math.round(newWidth / DAY_WIDTH);
+    bar.style.width = newWidth + 'px';
+    updateDragTooltip(e, dragStartDate, newDays);
+  }
+});
+
+document.addEventListener('mouseup', function(e) {
+  if (!isDragging || !dragTaskId) return;
+  const task = tasks.find(function(t) { return t.id === dragTaskId; });
+  if (task) {
+    const dx = e.clientX - dragStartX;
+    if (dragMode === 'move') {
+      const newOffset = Math.round((dragStartLeft + dx) / DAY_WIDTH);
+      task.start = addDays(START_DATE.toISOString().split('T')[0], newOffset);
+    } else {
+      task.days = Math.max(1, Math.round((dragStartWidth + dx) / DAY_WIDTH));
+    }
+    saveData();
+    render();
+    showToast('任务已更新');
+  }
+  isDragging = false;
+  dragTaskId = null;
+  dragMode = null;
+  hideDragTooltip();
+});
 
 function loadSettings() {
   try {
@@ -533,6 +616,7 @@ function render() {
       '<div class="gantt-bar" data-id="' + task.id + '" style="left:' + left + 'px;width:' + width + 'px;background:' + color + ';">' +
       '<div class="bar-progress" style="width:' + progress + '%"></div>' +
       '<span class="bar-text">' + task.name + (progress > 0 ? ' ' + progress + '%' : '') + '</span>' +
+      '<div class="resize-handle"></div>' +
       '</div></div>' +
       '<div class="gantt-chart-subrows ' + (isExpanded ? 'open' : '') + '">';
     for (let si = 0; si < task.subtasks.length; si++) {
@@ -543,6 +627,44 @@ function render() {
 
   document.getElementById('task-list').innerHTML = taskHTML;
   document.getElementById('bars-container').innerHTML = barsHTML;
+
+  // ===== 绑定拖拽事件 =====
+  document.querySelectorAll('.gantt-bar').forEach(function(bar) {
+    // 鼠标悬停时根据位置改变光标
+    bar.addEventListener('mousemove', function(e) {
+      if (isDragging) return;
+      const rect = bar.getBoundingClientRect();
+      if (rect.right - e.clientX <= 10 && rect.right - e.clientX >= 0) {
+        bar.style.cursor = 'ew-resize';
+      } else {
+        bar.style.cursor = 'pointer';
+      }
+    });
+    // 鼠标按下开始拖拽
+    bar.addEventListener('mousedown', function(e) {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = bar.getBoundingClientRect();
+      const id = parseInt(bar.dataset.id);
+      const task = tasks.find(function(t) { return t.id === id; });
+      if (!task) return;
+      // 判断模式：右边缘 10px 内为拉伸
+      if (rect.right - e.clientX <= 10 && rect.right - e.clientX >= 0) {
+        dragMode = 'resize';
+      } else {
+        dragMode = 'move';
+      }
+      isDragging = true;
+      dragTaskId = id;
+      dragStartX = e.clientX;
+      dragStartLeft = parseFloat(bar.style.left) || 0;
+      dragStartWidth = parseFloat(bar.style.width) || 0;
+      dragStartDate = task.start;
+      dragStartDays = task.days;
+      updateDragTooltip(e, task.start, task.days);
+    });
+  });
 
   document.querySelectorAll('.expand-icon').forEach(function(el) {
     el.addEventListener('click', function(e) {
@@ -767,7 +889,7 @@ function render() {
     });
   });
 
-  document.querySelectorAll('.gantt-task-row, .gantt-bar').forEach(function(el) {
+  document.querySelectorAll('.gantt-task-row').forEach(function(el) {
     el.addEventListener('click', function() {
       const id = parseInt(el.dataset.id);
       activeTaskId = activeTaskId === id ? null : id;
