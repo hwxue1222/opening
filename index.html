@@ -146,6 +146,7 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 
 @media (max-width:900px){.gantt-task-col{width:100%;border-right:none}.gantt-body{flex-direction:column}.gantt-chart-area{height:300px}.gantt-header{flex-wrap:wrap;gap:8px}.gantt-actions{width:100%;justify-content:flex-end}.settings-panel{width:100%}.lock-box{padding:24px}}
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -176,7 +177,7 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
   <div class="gantt-actions">
     <button class="gantt-btn" onclick="openSettings()">⚙️ 设置</button>
     <button class="gantt-btn" onclick="resetData()">🔄 重置</button>
-    <button class="gantt-btn primary" onclick="exportHTML()">⬇️ 导出</button>
+    <button class="gantt-btn primary" onclick="exportExcel()">📊 导出Excel</button>
     <button class="gantt-btn success" id="syncBtn" onclick="syncToGitHub()">🚀 同步到GitHub</button>
   </div>
 </div>
@@ -571,16 +572,125 @@ function resetData() {
     showToast('数据已重置');
   }
 }
-function exportHTML() {
-  const html = buildExportHTML();
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'restaurant_opening_gantt_' + new Date().toISOString().slice(0,10) + '.html';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('已导出HTML文件');
+async function exportExcel() {
+  // 动态加载 html2canvas（如果尚未加载）
+  if (typeof html2canvas === 'undefined') {
+    showToast('正在加载截图组件，请稍候...');
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = function() { exportExcel(); };
+    script.onerror = function() { showToast('加载失败，请检查网络'); };
+    document.head.appendChild(script);
+    return;
+  }
+
+  showToast('正在生成 Excel，请稍候...');
+  const btn = document.querySelector('button[onclick="exportExcel()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '生成中...'; }
+
+  try {
+    // 临时展开所有任务以确保完整截图
+    const prevExpanded = new Set(expandedIds);
+    expandedIds = new Set(tasks.map(function(t) { return t.id; }));
+    render();
+
+    // 等待渲染完成
+    await new Promise(function(r) { setTimeout(r, 300); });
+
+    const chartArea = document.getElementById('chart-area');
+    const canvas = await html2canvas(chartArea, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -chartArea.scrollTop,
+      windowWidth: document.getElementById('chart-rows').scrollWidth + 40,
+      windowHeight: chartArea.scrollHeight + 40
+    });
+
+    // 恢复展开状态
+    expandedIds = prevExpanded;
+    render();
+
+    const imgData = canvas.toDataURL('image/png');
+
+    // 构建 Excel 兼容的 HTML
+    let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: "Microsoft YaHei", Arial, sans-serif; padding: 20px; }
+  h2 { color: #333; margin-bottom: 8px; }
+  .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 24px; }
+  th, td { border: 1px solid #bbb; padding: 8px 10px; text-align: left; font-size: 12px; vertical-align: top; }
+  th { background: #f0f0f0; font-weight: bold; }
+  tr:nth-child(even) { background: #fafafa; }
+  .cat-证照 { background: #e3f2fd !important; }
+  .cat-装修 { background: #ffebee !important; }
+  .cat-采购 { background: #e8f5e9 !important; }
+  .cat-人员 { background: #f3e5f5 !important; }
+  .cat-营销 { background: #fafafa !important; }
+  .progress-0 { color: #999; }
+  .progress-100 { color: #43a047; font-weight: bold; }
+  img { max-width: 100%; height: auto; border: 1px solid #ddd; }
+  .footer { margin-top: 20px; font-size: 11px; color: #999; }
+</style>
+</head>
+<body>
+<h2>餐厅开业筹备甘特图</h2>
+<div class="meta">目标开业日：` + OPENING_DATE.toISOString().split('T')[0] + ` | 导出时间：` + new Date().toLocaleString('zh-CN') + `</div>
+
+<table>
+<tr>
+  <th>ID</th><th>任务名称</th><th>分类</th><th>负责人</th>
+  <th>开始日期</th><th>持续天数</th><th>结束日期</th><th>进度</th><th>状态</th><th>描述</th>
+</tr>`;
+
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
+      const progress = computeProgress(task);
+      const status = computeStatus(task);
+      const end = addDays(task.start, task.days);
+      const progressClass = progress === 0 ? 'progress-0' : (progress === 100 ? 'progress-100' : '');
+      html += '<tr class="cat-' + task.cat + '">' +
+        '<td>' + task.id + '</td>' +
+        '<td>' + task.name + '</td>' +
+        '<td>' + task.cat + '</td>' +
+        '<td>' + task.owner + '</td>' +
+        '<td>' + task.start + '</td>' +
+        '<td>' + task.days + '</td>' +
+        '<td>' + end + '</td>' +
+        '<td class="' + progressClass + '">' + progress + '%</td>' +
+        '<td>' + status + '</td>' +
+        '<td>' + task.desc + '</td>' +
+        '</tr>';
+    }
+
+    html += `</table>
+
+<h3>甘特图</h3>
+<img src="` + imgData + `" alt="甘特图">
+
+<div class="footer">由 餐厅开业筹备甘特图 自动生成</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '餐厅开业甘特图_' + new Date().toISOString().slice(0,10) + '.xls';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Excel 导出成功！');
+  } catch (err) {
+    console.error(err);
+    showToast('导出失败: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📊 导出Excel'; }
+  }
 }
 
 function getDaysDiff(d1, d2) {
