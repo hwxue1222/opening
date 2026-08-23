@@ -6,7 +6,7 @@
 <title>餐厅开业筹备甘特图</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--kimi-color-text-primary:#1a1a1a;--kimi-color-text-secondary:#666;--kimi-color-text-tertiary:#999;--kimi-color-text-quaternary:#bbb;--kimi-color-surface:#fff;--kimi-color-surface-muted:#f5f5f5;--kimi-color-surface-raised:#fafafa;--kimi-color-surface-strong:#eee;--kimi-color-border:#e0e0e0;--kimi-color-danger:#e53935;--kimi-color-positive:#43a047;--kimi-color-warning:#f5a623;--kimi-color-accent:#1976d2;--kimi-chart-1:#1976d2;--kimi-chart-2:#e53935;--kimi-chart-3:#43a047;--kimi-chart-4:#7e57c2;--kimi-chart-5:#9e9e9e;--kimi-font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;--t-fast:120ms;--ease-out:cubic-bezier(0,0,.2,1)}
+:root{--kimi-color-text-primary:#1a1a1a;--kimi-color-text-secondary:#666;--kimi-color-text-tertiary:#999;--kimi-color-text-quaternary:#bbb;--kimi-color-surface:#fff;--kimi-color-surface-muted:#f5f5f5;--kimi-color-surface-raised:#fafafa;--kimi-color-surface-strong:#eee;--kimi-color-border:#e0e0e0;--kimi-color-danger:#e53935;--kimi-color-positive:#43a047;--kimi-color-warning:#f5a623;--kimi-color-accent:#1976d2;--kimi-chart-1:#1976d2;--kimi-chart-2:#e53935;--kimi-chart-3:#43a047;--kimi-chart-4:#7e57c2;--kimi-chart-5:#9e9e9e;--kimi-font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;--t-fast:120ms;--t-normal:200ms;--t-micro:60ms;--t-slow:300ms;--ease-out:cubic-bezier(0,0,.2,1);--ease-standard:cubic-bezier(.4,0,.2,1);--kimi-space-1:4px;--kimi-space-2:8px;--kimi-space-3:12px;--kimi-space-4:16px;--kimi-space-5:20px;--kimi-space-6:24px;--kimi-space-7:32px;--kimi-radius-small:4px;--kimi-radius-chip:6px;--kimi-radius-button:8px;--kimi-radius-input:10px;--kimi-radius-panel:12px;--kimi-radius-large:16px;--kimi-radius-full:9999px}
 @media (prefers-color-scheme:dark){:root{--kimi-color-text-primary:#f0f0f0;--kimi-color-text-secondary:#aaa;--kimi-color-text-tertiary:#777;--kimi-color-text-quaternary:#555;--kimi-color-surface:#1a1a1a;--kimi-color-surface-muted:#2a2a2a;--kimi-color-surface-raised:#333;--kimi-color-surface-strong:#444;--kimi-color-border:#444;--kimi-color-danger:#ef5350;--kimi-color-positive:#66bb6a;--kimi-color-warning:#ffa726;--kimi-color-accent:#42a5f5;--kimi-chart-1:#42a5f5;--kimi-chart-2:#ef5350;--kimi-chart-3:#66bb6a;--kimi-chart-4:#ab47bc;--kimi-chart-5:#bdbdbd}}
 body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);background:var(--kimi-color-surface);overflow:hidden;height:100vh}
 .gantt-app{display:flex;flex-direction:column;height:100vh}
@@ -145,6 +145,14 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 .app-wrapper.locked{filter:blur(8px);pointer-events:none;user-select:none}
 
 @media (max-width:900px){.gantt-task-col{width:100%;border-right:none}.gantt-body{flex-direction:column}.gantt-chart-area{height:300px}.gantt-header{flex-wrap:wrap;gap:8px}.gantt-actions{width:100%;justify-content:flex-end}.settings-panel{width:100%}.lock-box{padding:24px}}
+
+/* ===== Kimi Button Styles ===== */
+.kimi-button{display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;font-size:14px;font-weight:500;border:1px solid transparent;border-radius:var(--kimi-radius-button);cursor:pointer;transition:all var(--t-fast) var(--ease-out);background:transparent;color:var(--kimi-color-text-primary);font-family:var(--kimi-font-sans)}
+.kimi-button:hover{opacity:.85}
+.kimi-button--primary{background:var(--kimi-color-text-primary);color:var(--kimi-color-surface);border-color:var(--kimi-color-text-primary)}
+.kimi-button--secondary{background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-primary);border-color:var(--kimi-color-border)}
+.kimi-button--ghost{background:transparent;color:var(--kimi-color-text-secondary);border-color:var(--kimi-color-border)}
+.kimi-button--ghost:hover{color:var(--kimi-color-text-primary);border-color:var(--kimi-color-text-tertiary)}
 
 /* ===== Multi-Store Dashboard ===== */
 .dashboard-view{padding:var(--kimi-space-4);max-width:1200px;margin:0 auto;font-family:var(--kimi-font-sans)}
