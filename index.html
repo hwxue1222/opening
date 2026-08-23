@@ -642,7 +642,13 @@ function loadData() {
   if (!currentStoreId) return;
   const store = stores.find(function(s) { return s.id === currentStoreId; });
   if (!store) return;
-  tasks = store.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  if (store.tasks && store.tasks.length > 0) {
+    tasks = store.tasks;
+  } else {
+    tasks = initDefaultTasks(store.openingDate);
+    store.tasks = tasks;
+    saveMultiStoreData();
+  }
   if (store.expandedIds) expandedIds = new Set(store.expandedIds);
   else expandedIds = new Set();
   OPENING_DATE = new Date(store.openingDate);
@@ -1158,6 +1164,10 @@ function addDays(dateStr,days) { const d=new Date(dateStr); d.setDate(d.getDate(
 
 function initDefaultTasks(openingDate) {
   var baseDate = addDays(openingDate, -60);
+  var refDate = '2026-08-01';
+  return JSON.parse(JSON.stringify(DEFAULT_TASKS)).map(function(t) {
+    var offset = getDaysDiff(refDate, t.start);
+    t.start = addDays(baseDate, offset);
   return JSON.parse(JSON.stringify(DEFAULT_TASKS)).map(function(t) {
     var offset = getDaysDiff(START_DATE.toISOString().split('T')[0], t.start);
     t.start = addDays(baseDate, offset);
