@@ -1176,9 +1176,6 @@ function initDefaultTasks(openingDate) {
   return JSON.parse(JSON.stringify(DEFAULT_TASKS)).map(function(t) {
     var offset = getDaysDiff(refDate, t.start);
     t.start = addDays(baseDate, offset);
-  return JSON.parse(JSON.stringify(DEFAULT_TASKS)).map(function(t) {
-    var offset = getDaysDiff(START_DATE.toISOString().split('T')[0], t.start);
-    t.start = addDays(baseDate, offset);
     return t;
   });
 }
