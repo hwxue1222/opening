@@ -145,13 +145,115 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 .app-wrapper.locked{filter:blur(8px);pointer-events:none;user-select:none}
 
 @media (max-width:900px){.gantt-task-col{width:100%;border-right:none}.gantt-body{flex-direction:column}.gantt-chart-area{height:300px}.gantt-header{flex-wrap:wrap;gap:8px}.gantt-actions{width:100%;justify-content:flex-end}.settings-panel{width:100%}.lock-box{padding:24px}}
+
+/* ===== Multi-Store Dashboard ===== */
+.dashboard-view{padding:var(--kimi-space-4);max-width:1200px;margin:0 auto;font-family:var(--kimi-font-sans)}
+.db-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--kimi-space-5)}
+.db-header h1{font-size:20px;font-weight:500}
+.db-subtitle{font-size:13px;color:var(--kimi-color-text-secondary);margin-top:2px}
+.db-toolbar{display:flex;gap:var(--kimi-space-3);margin-bottom:var(--kimi-space-4);flex-wrap:wrap}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--kimi-space-4)}
+.store-card{background:var(--kimi-color-surface-muted);border:1px solid var(--kimi-color-border);border-radius:var(--kimi-radius-panel);padding:var(--kimi-space-4);cursor:pointer;transition:border-color var(--t-fast),transform var(--t-fast);position:relative}
+.store-card:hover{border-color:var(--kimi-color-text-tertiary);transform:translateY(-1px)}
+.store-card .store-actions{position:absolute;top:8px;right:8px;opacity:0;transition:opacity var(--t-fast)}
+.store-card:hover .store-actions{opacity:1}
+.s-icon-btn{background:none;border:none;color:var(--kimi-color-text-tertiary);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:var(--kimi-radius-button)}
+.s-icon-btn:hover{color:var(--kimi-color-danger)}
+.s-name{font-size:16px;font-weight:500;margin-bottom:4px;padding-right:40px}
+.s-meta{font-size:12px;color:var(--kimi-color-text-secondary);margin-bottom:var(--kimi-space-3)}
+.s-meta span{margin-right:var(--kimi-space-3);white-space:nowrap}
+.s-progress{height:6px;background:var(--kimi-color-surface-strong);border-radius:var(--kimi-radius-full);overflow:hidden;margin-bottom:4px}
+.s-progress-fill{height:100%;border-radius:var(--kimi-radius-full);transition:width var(--t-normal)}
+.s-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--kimi-color-text-tertiary)}
+.s-status{display:inline-block;font-size:11px;padding:1px 8px;border-radius:var(--kimi-radius-chip);font-weight:500;margin-bottom:var(--kimi-space-2)}
+.status-soon{background:color-mix(in srgb,var(--kimi-color-warning) 15%,transparent);color:var(--kimi-color-warning)}
+.status-normal{background:color-mix(in srgb,var(--kimi-color-accent) 12%,transparent);color:var(--kimi-color-accent)}
+.status-ok{background:color-mix(in srgb,var(--kimi-color-positive) 12%,transparent);color:var(--kimi-color-positive)}
+.status-danger{background:color-mix(in srgb,var(--kimi-color-danger) 12%,transparent);color:var(--kimi-color-danger)}
+.status-done{background:color-mix(in srgb,var(--kimi-color-text-quaternary) 12%,transparent);color:var(--kimi-color-text-quaternary)}
+.db-empty{text-align:center;padding:var(--kimi-space-7);color:var(--kimi-color-text-tertiary)}
+.db-empty .big{font-size:48px;margin-bottom:var(--kimi-space-3)}
+.db-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:var(--kimi-space-3);margin-bottom:var(--kimi-space-4)}
+.db-stat{background:var(--kimi-color-surface-muted);border:1px solid var(--kimi-color-border);border-radius:var(--kimi-radius-panel);padding:var(--kimi-space-3);text-align:center}
+.db-stat-v{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.db-stat-l{font-size:11px;color:var(--kimi-color-text-secondary);margin-top:2px}
+/* Modal */
+.db-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:200;padding:var(--kimi-space-4)}
+.db-modal-overlay.open{display:flex}
+.db-modal{background:var(--kimi-color-surface);border:1px solid var(--kimi-color-border);border-radius:var(--kimi-radius-panel);width:100%;max-width:420px;padding:var(--kimi-space-5);max-height:90vh;overflow-y:auto}
+.db-modal-title{font-size:17px;font-weight:500;margin-bottom:var(--kimi-space-4)}
+.db-form-group{margin-bottom:var(--kimi-space-4)}
+.db-form-label{display:block;font-size:13px;margin-bottom:var(--kimi-space-1);color:var(--kimi-color-text-secondary)}
+.db-form-input{width:100%;padding:8px 12px;border:1px solid var(--kimi-color-border);border-radius:var(--kimi-radius-input);background:var(--kimi-color-surface);color:var(--kimi-color-text-primary);font-size:14px}
+.db-form-input:focus{outline:none;border-color:var(--kimi-color-text-primary)}
+.db-modal-actions{display:flex;gap:var(--kimi-space-3);justify-content:flex-end;margin-top:var(--kimi-space-5)}
+/* Back bar */
+.gantt-back-bar{padding:8px 16px;background:var(--kimi-color-surface-muted);border-bottom:1px solid var(--kimi-color-border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+
 </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
+<!-- ===== Dashboard View ===== -->
+<div id="dashboardView" class="dashboard-view">
+  <div class="db-header">
+    <div>
+      <h1>开业进度总览</h1>
+      <div class="db-subtitle">管理所有门店的开业筹备进度</div>
+    </div>
+  </div>
+  <div class="db-toolbar">
+    <button class="kimi-button kimi-button--primary" onclick="openStoreModal()">+ 添加门店</button>
+    <button class="kimi-button kimi-button--secondary" onclick="exportAllData()">导出全部</button>
+    <button class="kimi-button kimi-button--ghost" onclick="document.getElementById('importFile').click()">导入数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+  <div class="db-stats" id="dbStats"></div>
+  <div class="store-grid" id="storeGrid"></div>
+  <div class="db-empty" id="dbEmpty" style="display:none">
+    <div class="big">🏪</div>
+    <div>还没有门店，点击上方按钮添加第一家门店</div>
+  </div>
+</div>
+
+<!-- ===== Store Modal ===== -->
+<div class="db-modal-overlay" id="storeModalOverlay" onclick="if(event.target===this)closeStoreModal()">
+  <div class="db-modal">
+    <div class="db-modal-title" id="storeModalTitle">添加门店</div>
+    <div class="db-form-group">
+      <label class="db-form-label">门店名称</label>
+      <input class="db-form-input" type="text" id="storeName" placeholder="例如：中山路分店">
+    </div>
+    <div class="db-form-group">
+      <label class="db-form-label">地址</label>
+      <input class="db-form-input" type="text" id="storeAddress" placeholder="门店地址">
+    </div>
+    <div class="db-form-group">
+      <label class="db-form-label">目标开业日期</label>
+      <input class="db-form-input" type="date" id="storeOpeningDate">
+    </div>
+    <div class="db-form-group">
+      <label class="db-form-label">负责人</label>
+      <input class="db-form-input" type="text" id="storeManager" placeholder="负责人姓名">
+    </div>
+    <div class="db-modal-actions">
+      <button class="kimi-button kimi-button--ghost" onclick="closeStoreModal()">取消</button>
+      <button class="kimi-button kimi-button--primary" onclick="saveStore()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Gantt Detail View ===== -->
+<div id="ganttDetailView" style="display:none;height:100vh">
+  <div class="gantt-back-bar">
+    <button class="kimi-button kimi-button--ghost" onclick="backToDashboard()">← 返回门店列表</button>
+    <span id="ganttStoreName" style="font-weight:500;font-size:15px"></span>
+    <span id="ganttStoreMeta" style="font-size:13px;color:var(--kimi-color-text-secondary);margin-left:auto"></span>
+  </div>
+
+
 <!-- 密码保护遮罩层 -->
-<div class="lock-screen hidden" id="lockScreen">
+<div class="lock-screen" id="lockScreen">
   <div class="lock-box">
     <div class="lock-icon">🔒</div>
     <div class="lock-title">请输入访问密码</div>
@@ -172,27 +274,27 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 <div class="gantt-header">
   <div>
     <div class="gantt-title">餐厅开业筹备甘特图</div>
-    <div class="gantt-subtitle">目标开业日：<span id="openingDateDisplay">2026-12-01</span> | 倒计时 <span id="countdown">101</span> 天 | 数据自动保存到浏览器</div>
+    <div class="gantt-subtitle">目标开业日：<span id="openingDateDisplay"></span> | 倒计时 <span id="countdown"></span> 天 | 数据自动保存到浏览器</div>
   </div>
   <div class="gantt-actions">
     <button class="gantt-btn" onclick="openSettings()">⚙️ 设置</button>
     <button class="gantt-btn" onclick="resetData()">🔄 重置</button>
-    <button class="gantt-btn primary" onclick="exportExcel()">📊 导出Excel</button>
-    <button class="gantt-btn success" id="syncBtn" onclick="syncToGitHub()" disabled="">同步中...</button>
+    <button class="gantt-btn primary" onclick="exportHTML()">⬇️ 导出</button>
+    <button class="gantt-btn success" id="syncBtn" onclick="syncToGitHub()">🚀 同步到GitHub</button>
   </div>
 </div>
 <div class="gantt-body">
   <div class="gantt-task-col">
     <div class="gantt-task-header">任务名称</div>
-    <div id="task-list"><div class="gantt-task-group"><div class="gantt-task-row " data-id="1"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-1)"></div><span class="task-name">营业执照申请</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="1" data-sid="0"><div class="sub-check "></div><span class="sub-name ">准备身份证复印件</span><div class="sub-del" data-tid="1" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="1" data-sid="1"><div class="sub-check "></div><span class="sub-name ">准备场地租赁合同</span><div class="sub-del" data-tid="1" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="1" data-sid="2"><div class="sub-check "></div><span class="sub-name ">填写申请表格</span><div class="sub-del" data-tid="1" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="1" data-sid="3"><div class="sub-check "></div><span class="sub-name ">提交市场监管局</span><div class="sub-del" data-tid="1" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="1" data-sid="4"><div class="sub-check "></div><span class="sub-name ">领取营业执照</span><div class="sub-del" data-tid="1" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="1"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="2"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-1)"></div><span class="task-name">食品经营许可证</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="2" data-sid="0"><div class="sub-check "></div><span class="sub-name ">绘制厨房布局图</span><div class="sub-del" data-tid="2" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="2" data-sid="1"><div class="sub-check "></div><span class="sub-name ">制定食品安全管理制度</span><div class="sub-del" data-tid="2" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="2" data-sid="2"><div class="sub-check "></div><span class="sub-name ">办理从业人员健康证</span><div class="sub-del" data-tid="2" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="2" data-sid="3"><div class="sub-check "></div><span class="sub-name ">提交申请材料</span><div class="sub-del" data-tid="2" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="2" data-sid="4"><div class="sub-check "></div><span class="sub-name ">现场核查</span><div class="sub-del" data-tid="2" data-sid="4">×</div></div><div class="gantt-subtask-row" data-tid="2" data-sid="5"><div class="sub-check "></div><span class="sub-name ">领取许可证</span><div class="sub-del" data-tid="2" data-sid="5">×</div></div><div class="gantt-subtask-add" data-tid="2"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="3"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-1)"></div><span class="task-name">消防验收</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="3" data-sid="0"><div class="sub-check "></div><span class="sub-name ">消防设计备案</span><div class="sub-del" data-tid="3" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="3" data-sid="1"><div class="sub-check "></div><span class="sub-name ">安装消防设备</span><div class="sub-del" data-tid="3" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="3" data-sid="2"><div class="sub-check "></div><span class="sub-name ">疏散通道验收</span><div class="sub-del" data-tid="3" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="3" data-sid="3"><div class="sub-check "></div><span class="sub-name ">灭火器配置检查</span><div class="sub-del" data-tid="3" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="3" data-sid="4"><div class="sub-check "></div><span class="sub-name ">取得消防验收合格证明</span><div class="sub-del" data-tid="3" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="3"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="4"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-1)"></div><span class="task-name">环保排污许可</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="4" data-sid="0"><div class="sub-check "></div><span class="sub-name ">安装油烟净化器</span><div class="sub-del" data-tid="4" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="4" data-sid="1"><div class="sub-check "></div><span class="sub-name ">安装隔油池</span><div class="sub-del" data-tid="4" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="4" data-sid="2"><div class="sub-check "></div><span class="sub-name ">提交排污申请</span><div class="sub-del" data-tid="4" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="4" data-sid="3"><div class="sub-check "></div><span class="sub-name ">现场检查</span><div class="sub-del" data-tid="4" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="4" data-sid="4"><div class="sub-check "></div><span class="sub-name ">取得排污许可证</span><div class="sub-del" data-tid="4" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="4"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="5"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-1)"></div><span class="task-name">开业验收</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="5" data-sid="0"><div class="sub-check "></div><span class="sub-name ">卫生部门现场检查</span><div class="sub-del" data-tid="5" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="5" data-sid="1"><div class="sub-check "></div><span class="sub-name ">消防最终复查</span><div class="sub-del" data-tid="5" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="5" data-sid="2"><div class="sub-check "></div><span class="sub-name ">食品安全综合核查</span><div class="sub-del" data-tid="5" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="5" data-sid="3"><div class="sub-check "></div><span class="sub-name ">整改不合格项</span><div class="sub-del" data-tid="5" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="5" data-sid="4"><div class="sub-check "></div><span class="sub-name ">取得开业许可</span><div class="sub-del" data-tid="5" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="5"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="6"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-2)"></div><span class="task-name">场地设计与测量</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="6" data-sid="0"><div class="sub-check "></div><span class="sub-name ">现场量房</span><div class="sub-del" data-tid="6" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="6" data-sid="1"><div class="sub-check "></div><span class="sub-name ">平面布局图</span><div class="sub-del" data-tid="6" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="6" data-sid="2"><div class="sub-check "></div><span class="sub-name ">水电点位图</span><div class="sub-del" data-tid="6" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="6" data-sid="3"><div class="sub-check "></div><span class="sub-name ">效果图确认</span><div class="sub-del" data-tid="6" data-sid="3">×</div></div><div class="gantt-subtask-add" data-tid="6"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="7"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-2)"></div><span class="task-name">水电改造</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="7" data-sid="0"><div class="sub-check "></div><span class="sub-name ">电路布线</span><div class="sub-del" data-tid="7" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="7" data-sid="1"><div class="sub-check "></div><span class="sub-name ">上下水安装</span><div class="sub-del" data-tid="7" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="7" data-sid="2"><div class="sub-check "></div><span class="sub-name ">排烟管道预埋</span><div class="sub-del" data-tid="7" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="7" data-sid="3"><div class="sub-check "></div><span class="sub-name ">隐蔽工程验收</span><div class="sub-del" data-tid="7" data-sid="3">×</div></div><div class="gantt-subtask-add" data-tid="7"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="8"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-2)"></div><span class="task-name">厨房设备安装</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="8" data-sid="0"><div class="sub-check "></div><span class="sub-name ">灶台安装</span><div class="sub-del" data-tid="8" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="8" data-sid="1"><div class="sub-check "></div><span class="sub-name ">蒸柜/烤箱就位</span><div class="sub-del" data-tid="8" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="8" data-sid="2"><div class="sub-check "></div><span class="sub-name ">冷藏柜安装</span><div class="sub-del" data-tid="8" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="8" data-sid="3"><div class="sub-check "></div><span class="sub-name ">排烟罩吊装</span><div class="sub-del" data-tid="8" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="8" data-sid="4"><div class="sub-check "></div><span class="sub-name ">设备通电调试</span><div class="sub-del" data-tid="8" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="8"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="9"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-2)"></div><span class="task-name">前厅装修</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="9" data-sid="0"><div class="sub-check "></div><span class="sub-name ">墙面处理</span><div class="sub-del" data-tid="9" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="1"><div class="sub-check "></div><span class="sub-name ">地面铺装</span><div class="sub-del" data-tid="9" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="2"><div class="sub-check "></div><span class="sub-name ">吊顶安装</span><div class="sub-del" data-tid="9" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="3"><div class="sub-check "></div><span class="sub-name ">灯光布置</span><div class="sub-del" data-tid="9" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="4"><div class="sub-check "></div><span class="sub-name ">收银台制作</span><div class="sub-del" data-tid="9" data-sid="4">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="5"><div class="sub-check "></div><span class="sub-name ">桌椅进场摆放</span><div class="sub-del" data-tid="9" data-sid="5">×</div></div><div class="gantt-subtask-row" data-tid="9" data-sid="6"><div class="sub-check "></div><span class="sub-name ">软装布置</span><div class="sub-del" data-tid="9" data-sid="6">×</div></div><div class="gantt-subtask-add" data-tid="9"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="10"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-3)"></div><span class="task-name">厨房设备采购</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="proc-table"><div class="proc-table-header"><span></span><span>名称</span><span>数量</span><span>预算</span><span>付款</span><span title="出货">📦</span><span title="到货">✓</span><span></span></div><div class="proc-table-row" data-tid="10" data-sid="0"><div class="pt-check "></div><div class="pt-cell">商用燃气灶台</div><div class="pt-cell num">2台</div><div class="pt-cell num">¥8,000</div><div class="pt-cell">50%预付</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="0">×</div></div><div class="proc-table-row" data-tid="10" data-sid="1"><div class="pt-check "></div><div class="pt-cell">蒸柜</div><div class="pt-cell num">1台</div><div class="pt-cell num">¥5,000</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="1">×</div></div><div class="proc-table-row" data-tid="10" data-sid="2"><div class="pt-check "></div><div class="pt-cell">烤箱</div><div class="pt-cell num">1台</div><div class="pt-cell num">¥6,500</div><div class="pt-cell">50%预付</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="2">×</div></div><div class="proc-table-row" data-tid="10" data-sid="3"><div class="pt-check "></div><div class="pt-cell">四门冰箱</div><div class="pt-cell num">2台</div><div class="pt-cell num">¥7,000</div><div class="pt-cell">货到付款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="3">×</div></div><div class="proc-table-row" data-tid="10" data-sid="4"><div class="pt-check "></div><div class="pt-cell">洗碗机</div><div class="pt-cell num">1台</div><div class="pt-cell num">¥12,000</div><div class="pt-cell">分期</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="4">×</div></div><div class="proc-table-row" data-tid="10" data-sid="5"><div class="pt-check "></div><div class="pt-cell">排烟系统</div><div class="pt-cell num">1套</div><div class="pt-cell num">¥15,000</div><div class="pt-cell">50%预付</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="10" data-sid="5">×</div></div><div class="proc-table-add" data-tid="10"><span class="add-icon">+</span><span>添加采购项</span></div></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="11"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-3)"></div><span class="task-name">餐具器皿采购</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="proc-table"><div class="proc-table-header"><span></span><span>名称</span><span>数量</span><span>预算</span><span>付款</span><span title="出货">📦</span><span title="到货">✓</span><span></span></div><div class="proc-table-row" data-tid="11" data-sid="0"><div class="pt-check "></div><div class="pt-cell">陶瓷碗碟套装</div><div class="pt-cell num">200套</div><div class="pt-cell num">¥4,000</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="11" data-sid="0">×</div></div><div class="proc-table-row" data-tid="11" data-sid="1"><div class="pt-check "></div><div class="pt-cell">筷子/勺子</div><div class="pt-cell num">300双</div><div class="pt-cell num">¥1,500</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="11" data-sid="1">×</div></div><div class="proc-table-row" data-tid="11" data-sid="2"><div class="pt-check "></div><div class="pt-cell">托盘</div><div class="pt-cell num">50个</div><div class="pt-cell num">¥800</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="11" data-sid="2">×</div></div><div class="proc-table-row" data-tid="11" data-sid="3"><div class="pt-check "></div><div class="pt-cell">酒杯</div><div class="pt-cell num">100个</div><div class="pt-cell num">¥1,200</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="11" data-sid="3">×</div></div><div class="proc-table-row" data-tid="11" data-sid="4"><div class="pt-check "></div><div class="pt-cell">茶壶/茶杯</div><div class="pt-cell num">30套</div><div class="pt-cell num">¥2,000</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="11" data-sid="4">×</div></div><div class="proc-table-add" data-tid="11"><span class="add-icon">+</span><span>添加采购项</span></div></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="12"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-3)"></div><span class="task-name">食材供应商签约</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="proc-table"><div class="proc-table-header"><span></span><span>名称</span><span>数量</span><span>预算</span><span>付款</span><span title="出货">📦</span><span title="到货">✓</span><span></span></div><div class="proc-table-row" data-tid="12" data-sid="0"><div class="pt-check "></div><div class="pt-cell">肉类供应商</div><div class="pt-cell num">3家</div><div class="pt-cell num">月结</div><div class="pt-cell">月结</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="12" data-sid="0">×</div></div><div class="proc-table-row" data-tid="12" data-sid="1"><div class="pt-check "></div><div class="pt-cell">蔬菜供应商</div><div class="pt-cell num">2家</div><div class="pt-cell num">周结</div><div class="pt-cell">周结</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="12" data-sid="1">×</div></div><div class="proc-table-row" data-tid="12" data-sid="2"><div class="pt-check "></div><div class="pt-cell">海鲜供应商</div><div class="pt-cell num">2家</div><div class="pt-cell num">现结</div><div class="pt-cell">现结</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="12" data-sid="2">×</div></div><div class="proc-table-row" data-tid="12" data-sid="3"><div class="pt-check "></div><div class="pt-cell">粮油调料供应商</div><div class="pt-cell num">1家</div><div class="pt-cell num">月结</div><div class="pt-cell">月结</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="12" data-sid="3">×</div></div><div class="proc-table-add" data-tid="12"><span class="add-icon">+</span><span>添加采购项</span></div></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="13"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-3)"></div><span class="task-name">POS系统与收银设备</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="proc-table"><div class="proc-table-header"><span></span><span>名称</span><span>数量</span><span>预算</span><span>付款</span><span title="出货">📦</span><span title="到货">✓</span><span></span></div><div class="proc-table-row" data-tid="13" data-sid="0"><div class="pt-check "></div><div class="pt-cell">收银机</div><div class="pt-cell num">2台</div><div class="pt-cell num">¥6,000</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="13" data-sid="0">×</div></div><div class="proc-table-row" data-tid="13" data-sid="1"><div class="pt-check "></div><div class="pt-cell">扫码枪</div><div class="pt-cell num">2把</div><div class="pt-cell num">¥400</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="13" data-sid="1">×</div></div><div class="proc-table-row" data-tid="13" data-sid="2"><div class="pt-check "></div><div class="pt-cell">小票打印机</div><div class="pt-cell num">3台</div><div class="pt-cell num">¥900</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="13" data-sid="2">×</div></div><div class="proc-table-row" data-tid="13" data-sid="3"><div class="pt-check "></div><div class="pt-cell">后厨KDS屏幕</div><div class="pt-cell num">2台</div><div class="pt-cell num">¥3,000</div><div class="pt-cell">全款</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="13" data-sid="3">×</div></div><div class="proc-table-row" data-tid="13" data-sid="4"><div class="pt-check "></div><div class="pt-cell">点餐系统软件</div><div class="pt-cell num">1套</div><div class="pt-cell num">¥5,000/年</div><div class="pt-cell">年付</div><div class="pt-ship "></div><div class="pt-arrive "></div><div class="pt-del" data-tid="13" data-sid="4">×</div></div><div class="proc-table-add" data-tid="13"><span class="add-icon">+</span><span>添加采购项</span></div></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="14"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-4)"></div><span class="task-name">店长/主厨招聘</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="14" data-sid="0"><div class="sub-check "></div><span class="sub-name ">发布招聘信息</span><div class="sub-del" data-tid="14" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="1"><div class="sub-check "></div><span class="sub-name ">简历筛选</span><div class="sub-del" data-tid="14" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="2"><div class="sub-check "></div><span class="sub-name ">初试</span><div class="sub-del" data-tid="14" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="3"><div class="sub-check "></div><span class="sub-name ">复试/试菜</span><div class="sub-del" data-tid="14" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="4"><div class="sub-check "></div><span class="sub-name ">背景调查</span><div class="sub-del" data-tid="14" data-sid="4">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="5"><div class="sub-check "></div><span class="sub-name ">Offer发放</span><div class="sub-del" data-tid="14" data-sid="5">×</div></div><div class="gantt-subtask-row" data-tid="14" data-sid="6"><div class="sub-check "></div><span class="sub-name ">签约入职</span><div class="sub-del" data-tid="14" data-sid="6">×</div></div><div class="gantt-subtask-add" data-tid="14"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="15"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-4)"></div><span class="task-name">厨师团队招聘</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="15" data-sid="0"><div class="sub-check "></div><span class="sub-name ">确定编制需求</span><div class="sub-del" data-tid="15" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="15" data-sid="1"><div class="sub-check "></div><span class="sub-name ">发布招聘</span><div class="sub-del" data-tid="15" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="15" data-sid="2"><div class="sub-check "></div><span class="sub-name ">简历筛选</span><div class="sub-del" data-tid="15" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="15" data-sid="3"><div class="sub-check "></div><span class="sub-name ">面试试菜</span><div class="sub-del" data-tid="15" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="15" data-sid="4"><div class="sub-check "></div><span class="sub-name ">录用签约</span><div class="sub-del" data-tid="15" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="15"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="16"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-4)"></div><span class="task-name">服务人员招聘</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="16" data-sid="0"><div class="sub-check "></div><span class="sub-name ">确定招聘人数</span><div class="sub-del" data-tid="16" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="16" data-sid="1"><div class="sub-check "></div><span class="sub-name ">发布招聘</span><div class="sub-del" data-tid="16" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="16" data-sid="2"><div class="sub-check "></div><span class="sub-name ">面试筛选</span><div class="sub-del" data-tid="16" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="16" data-sid="3"><div class="sub-check "></div><span class="sub-name ">录用通知</span><div class="sub-del" data-tid="16" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="16" data-sid="4"><div class="sub-check "></div><span class="sub-name ">办理入职</span><div class="sub-del" data-tid="16" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="16"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="17"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-4)"></div><span class="task-name">全员培训</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="17" data-sid="0"><div class="sub-check "></div><span class="sub-name ">制定培训计划</span><div class="sub-del" data-tid="17" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="1"><div class="sub-check "></div><span class="sub-name ">服务礼仪培训</span><div class="sub-del" data-tid="17" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="2"><div class="sub-check "></div><span class="sub-name ">菜品知识培训</span><div class="sub-del" data-tid="17" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="3"><div class="sub-check "></div><span class="sub-name ">卫生标准培训</span><div class="sub-del" data-tid="17" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="4"><div class="sub-check "></div><span class="sub-name ">POS系统操作培训</span><div class="sub-del" data-tid="17" data-sid="4">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="5"><div class="sub-check "></div><span class="sub-name ">应急演练</span><div class="sub-del" data-tid="17" data-sid="5">×</div></div><div class="gantt-subtask-row" data-tid="17" data-sid="6"><div class="sub-check "></div><span class="sub-name ">考核通过</span><div class="sub-del" data-tid="17" data-sid="6">×</div></div><div class="gantt-subtask-add" data-tid="17"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="18"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-5)"></div><span class="task-name">品牌VI设计</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="18" data-sid="0"><div class="sub-check "></div><span class="sub-name ">Logo设计定稿</span><div class="sub-del" data-tid="18" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="18" data-sid="1"><div class="sub-check "></div><span class="sub-name ">菜单设计</span><div class="sub-del" data-tid="18" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="18" data-sid="2"><div class="sub-check "></div><span class="sub-name ">外卖包装设计</span><div class="sub-del" data-tid="18" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="18" data-sid="3"><div class="sub-check "></div><span class="sub-name ">员工制服设计</span><div class="sub-del" data-tid="18" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="18" data-sid="4"><div class="sub-check "></div><span class="sub-name ">店面招牌设计</span><div class="sub-del" data-tid="18" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="18"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="19"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-5)"></div><span class="task-name">社交媒体预热</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="19" data-sid="0"><div class="sub-check "></div><span class="sub-name ">注册各平台账号</span><div class="sub-del" data-tid="19" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="19" data-sid="1"><div class="sub-check "></div><span class="sub-name ">拍摄装修进度视频</span><div class="sub-del" data-tid="19" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="19" data-sid="2"><div class="sub-check "></div><span class="sub-name ">菜品预告拍摄</span><div class="sub-del" data-tid="19" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="19" data-sid="3"><div class="sub-check "></div><span class="sub-name ">发布预热内容</span><div class="sub-del" data-tid="19" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="19" data-sid="4"><div class="sub-check "></div><span class="sub-name ">互动引流</span><div class="sub-del" data-tid="19" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="19"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="20"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-5)"></div><span class="task-name">开业活动策划</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="20" data-sid="0"><div class="sub-check "></div><span class="sub-name ">确定活动方案</span><div class="sub-del" data-tid="20" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="20" data-sid="1"><div class="sub-check "></div><span class="sub-name ">设计宣传物料</span><div class="sub-del" data-tid="20" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="20" data-sid="2"><div class="sub-check "></div><span class="sub-name ">联系媒体/KOL</span><div class="sub-del" data-tid="20" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="20" data-sid="3"><div class="sub-check "></div><span class="sub-name ">准备开业礼品</span><div class="sub-del" data-tid="20" data-sid="3">×</div></div><div class="gantt-subtask-add" data-tid="20"><span class="add-icon">+</span><span>添加子任务</span></div></div></div><div class="gantt-task-group"><div class="gantt-task-row " data-id="21"><div class="expand-icon ">▶</div><div class="task-cat" style="background:var(--kimi-chart-5)"></div><span class="task-name">试营业</span><span class="task-progress">0%</span><span class="task-status" style="background:var(--kimi-color-surface-muted);color:var(--kimi-color-text-tertiary)">未开始</span></div><div class="gantt-subtask-list "><div class="gantt-subtask-row" data-tid="21" data-sid="0"><div class="sub-check "></div><span class="sub-name ">确定试营业名单</span><div class="sub-del" data-tid="21" data-sid="0">×</div></div><div class="gantt-subtask-row" data-tid="21" data-sid="1"><div class="sub-check "></div><span class="sub-name ">预约通知</span><div class="sub-del" data-tid="21" data-sid="1">×</div></div><div class="gantt-subtask-row" data-tid="21" data-sid="2"><div class="sub-check "></div><span class="sub-name ">试营业执行</span><div class="sub-del" data-tid="21" data-sid="2">×</div></div><div class="gantt-subtask-row" data-tid="21" data-sid="3"><div class="sub-check "></div><span class="sub-name ">收集反馈</span><div class="sub-del" data-tid="21" data-sid="3">×</div></div><div class="gantt-subtask-row" data-tid="21" data-sid="4"><div class="sub-check "></div><span class="sub-name ">问题整改</span><div class="sub-del" data-tid="21" data-sid="4">×</div></div><div class="gantt-subtask-add" data-tid="21"><span class="add-icon">+</span><span>添加子任务</span></div></div></div></div>
+    <div id="task-list"></div>
   </div>
   <div class="gantt-chart-area" id="chart-area">
-    <div class="gantt-chart-header" id="chart-header"><div class="gantt-day-cell weekend">8/1</div><div class="gantt-day-cell weekend">8/2</div><div class="gantt-day-cell ">8/3</div><div class="gantt-day-cell ">8/4</div><div class="gantt-day-cell ">8/5</div><div class="gantt-day-cell ">8/6</div><div class="gantt-day-cell ">8/7</div><div class="gantt-day-cell weekend">8/8</div><div class="gantt-day-cell weekend">8/9</div><div class="gantt-day-cell ">8/10</div><div class="gantt-day-cell ">8/11</div><div class="gantt-day-cell ">8/12</div><div class="gantt-day-cell ">8/13</div><div class="gantt-day-cell ">8/14</div><div class="gantt-day-cell weekend">8/15</div><div class="gantt-day-cell weekend">8/16</div><div class="gantt-day-cell ">8/17</div><div class="gantt-day-cell ">8/18</div><div class="gantt-day-cell ">8/19</div><div class="gantt-day-cell ">8/20</div><div class="gantt-day-cell ">8/21</div><div class="gantt-day-cell weekend">8/22</div><div class="gantt-day-cell weekend">8/23</div><div class="gantt-day-cell ">8/24</div><div class="gantt-day-cell ">8/25</div><div class="gantt-day-cell ">8/26</div><div class="gantt-day-cell ">8/27</div><div class="gantt-day-cell ">8/28</div><div class="gantt-day-cell weekend">8/29</div><div class="gantt-day-cell weekend">8/30</div><div class="gantt-day-cell ">8/31</div><div class="gantt-day-cell ">9/1</div><div class="gantt-day-cell ">9/2</div><div class="gantt-day-cell ">9/3</div><div class="gantt-day-cell ">9/4</div><div class="gantt-day-cell weekend">9/5</div><div class="gantt-day-cell weekend">9/6</div><div class="gantt-day-cell ">9/7</div><div class="gantt-day-cell ">9/8</div><div class="gantt-day-cell ">9/9</div><div class="gantt-day-cell ">9/10</div><div class="gantt-day-cell ">9/11</div><div class="gantt-day-cell weekend">9/12</div><div class="gantt-day-cell weekend">9/13</div><div class="gantt-day-cell ">9/14</div><div class="gantt-day-cell ">9/15</div><div class="gantt-day-cell ">9/16</div><div class="gantt-day-cell ">9/17</div><div class="gantt-day-cell ">9/18</div><div class="gantt-day-cell weekend">9/19</div><div class="gantt-day-cell weekend">9/20</div><div class="gantt-day-cell ">9/21</div><div class="gantt-day-cell ">9/22</div><div class="gantt-day-cell ">9/23</div><div class="gantt-day-cell ">9/24</div><div class="gantt-day-cell ">9/25</div><div class="gantt-day-cell weekend">9/26</div><div class="gantt-day-cell weekend">9/27</div><div class="gantt-day-cell ">9/28</div><div class="gantt-day-cell ">9/29</div><div class="gantt-day-cell ">9/30</div><div class="gantt-day-cell ">10/1</div><div class="gantt-day-cell ">10/2</div><div class="gantt-day-cell weekend">10/3</div><div class="gantt-day-cell weekend">10/4</div><div class="gantt-day-cell ">10/5</div><div class="gantt-day-cell ">10/6</div><div class="gantt-day-cell ">10/7</div><div class="gantt-day-cell ">10/8</div><div class="gantt-day-cell ">10/9</div><div class="gantt-day-cell weekend">10/10</div><div class="gantt-day-cell weekend">10/11</div><div class="gantt-day-cell ">10/12</div><div class="gantt-day-cell ">10/13</div><div class="gantt-day-cell ">10/14</div><div class="gantt-day-cell ">10/15</div><div class="gantt-day-cell ">10/16</div><div class="gantt-day-cell weekend">10/17</div><div class="gantt-day-cell weekend">10/18</div><div class="gantt-day-cell ">10/19</div><div class="gantt-day-cell ">10/20</div><div class="gantt-day-cell ">10/21</div><div class="gantt-day-cell ">10/22</div><div class="gantt-day-cell ">10/23</div><div class="gantt-day-cell weekend">10/24</div><div class="gantt-day-cell weekend">10/25</div><div class="gantt-day-cell ">10/26</div><div class="gantt-day-cell ">10/27</div><div class="gantt-day-cell ">10/28</div><div class="gantt-day-cell ">10/29</div><div class="gantt-day-cell ">10/30</div><div class="gantt-day-cell weekend">10/31</div><div class="gantt-day-cell weekend">11/1</div><div class="gantt-day-cell ">11/2</div><div class="gantt-day-cell ">11/3</div><div class="gantt-day-cell ">11/4</div><div class="gantt-day-cell ">11/5</div><div class="gantt-day-cell ">11/6</div><div class="gantt-day-cell weekend">11/7</div><div class="gantt-day-cell weekend">11/8</div><div class="gantt-day-cell ">11/9</div><div class="gantt-day-cell ">11/10</div><div class="gantt-day-cell ">11/11</div><div class="gantt-day-cell ">11/12</div><div class="gantt-day-cell ">11/13</div><div class="gantt-day-cell weekend">11/14</div><div class="gantt-day-cell weekend">11/15</div><div class="gantt-day-cell ">11/16</div><div class="gantt-day-cell ">11/17</div><div class="gantt-day-cell ">11/18</div><div class="gantt-day-cell ">11/19</div><div class="gantt-day-cell ">11/20</div><div class="gantt-day-cell weekend">11/21</div><div class="gantt-day-cell weekend">11/22</div><div class="gantt-day-cell ">11/23</div><div class="gantt-day-cell ">11/24</div><div class="gantt-day-cell ">11/25</div><div class="gantt-day-cell ">11/26</div><div class="gantt-day-cell ">11/27</div><div class="gantt-day-cell weekend">11/28</div><div class="gantt-day-cell weekend">11/29</div><div class="gantt-day-cell ">11/30</div><div class="gantt-day-cell ">12/1</div><div class="gantt-day-cell ">12/2</div><div class="gantt-day-cell ">12/3</div><div class="gantt-day-cell ">12/4</div><div class="gantt-day-cell weekend">12/5</div></div>
-    <div class="gantt-chart-rows" id="chart-rows" style="width: 4572px;">
-      <div class="gantt-grid-bg" id="grid-bg"><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col weekend"></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col "></div><div class="gantt-grid-col weekend"></div></div>
-      <div class="gantt-today-line" id="today-line" style="left: 774px; display: block;"></div>
-      <div class="gantt-today-label" id="today-label" style="left: 760px; display: block;">今天</div>
-      <div id="bars-container"><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="1" style="left:72px;width:504px;background:var(--kimi-chart-1);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">营业执照申请</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="2" style="left:144px;width:936px;background:var(--kimi-chart-1);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">食品经营许可证</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="3" style="left:324px;width:360px;background:var(--kimi-chart-1);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">消防验收</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="4" style="left:504px;width:432px;background:var(--kimi-chart-1);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">环保排污许可</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="5" style="left:1620px;width:360px;background:var(--kimi-chart-1);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">开业验收</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="6" style="left:0px;width:252px;background:var(--kimi-chart-2);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">场地设计与测量</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="7" style="left:252px;width:360px;background:var(--kimi-chart-2);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">水电改造</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="8" style="left:612px;width:432px;background:var(--kimi-chart-2);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">厨房设备安装</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="9" style="left: 684px; width: 900px; background: var(--kimi-chart-2); cursor: pointer;"><div class="bar-progress" style="width:0%"></div><span class="bar-text">前厅装修</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="10" style="left:0px;width:720px;background:var(--kimi-chart-3);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">厨房设备采购</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="11" style="left:684px;width:540px;background:var(--kimi-chart-3);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">餐具器皿采购</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="12" style="left: 864px; width: 360px; background: var(--kimi-chart-3); cursor: pointer;"><div class="bar-progress" style="width:0%"></div><span class="bar-text">食材供应商签约</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="13" style="left: 1116px; width: 252px; background: var(--kimi-chart-3); cursor: pointer;"><div class="bar-progress" style="width:0%"></div><span class="bar-text">POS系统与收银设备</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="14" style="left:0px;width:756px;background:var(--kimi-chart-4);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">店长/主厨招聘</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="15" style="left: 504px; width: 720px; background: var(--kimi-chart-4); cursor: pointer;"><div class="bar-progress" style="width:0%"></div><span class="bar-text">厨师团队招聘</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="16" style="left:684px;width:648px;background:var(--kimi-chart-4);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">服务人员招聘</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="17" style="left:1440px;width:504px;background:var(--kimi-chart-4);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">全员培训</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="18" style="left:0px;width:504px;background:var(--kimi-chart-5);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">品牌VI设计</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="19" style="left:1116px;width:720px;background:var(--kimi-chart-5);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">社交媒体预热</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="20" style="left:1440px;width:360px;background:var(--kimi-chart-5);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">开业活动策划</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div><div class="gantt-chart-group"><div class="gantt-chart-row"><div class="gantt-bar" data-id="21" style="left:1800px;width:360px;background:var(--kimi-chart-5);"><div class="bar-progress" style="width:0%"></div><span class="bar-text">试营业</span><div class="resize-handle"></div></div></div><div class="gantt-chart-subrows "><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div><div class="gantt-chart-subrow"></div></div></div></div>
+    <div class="gantt-chart-header" id="chart-header"></div>
+    <div class="gantt-chart-rows" id="chart-rows">
+      <div class="gantt-grid-bg" id="grid-bg"></div>
+      <div class="gantt-today-line" id="today-line"></div>
+      <div class="gantt-today-label" id="today-label">今天</div>
+      <div id="bars-container"></div>
     </div>
     <div class="gantt-detail-panel" id="detail-panel">
       <button class="gantt-detail-close" onclick="closeDetail()">×</button>
@@ -210,6 +312,7 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
 </div>
 </div>
 
+</div>
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-title">设置</div>
@@ -251,12 +354,17 @@ body{font-family:var(--kimi-font-sans);color:var(--kimi-color-text-primary);back
   </div>
   <div class="settings-hint" style="margin-top:20px">设置保存在浏览器中，不会上传到服务器。<br>Token 只用于通过 GitHub API 更新你的仓库文件。</div>
 </div>
-<div class="toast" id="toast">设置已保存</div>
+<div class="toast" id="toast"></div>
 
 <script>
 const START_DATE = new Date('2026-08-01');
 const DAY_WIDTH = 36;
 const STORAGE_KEY = 'restaurant_gantt_data_v2';
+const MULTI_STORE_KEY = 'multi_store_opening_v2';
+let stores = [];
+let currentStoreId = null;
+let editingStoreId = null;
+
 const SETTINGS_KEY = 'restaurant_gantt_settings_v1';
 const LOCK_KEY = 'restaurant_gantt_unlocked_v1';
 const DEFAULT_PASSWORD = 'opening2026';
@@ -278,7 +386,7 @@ const STATUS_STYLES = {
   '延期': { bg: 'color-mix(in srgb, var(--kimi-color-danger) 12%, transparent)', text: 'var(--kimi-color-danger)' }
 };
 
-const DEFAULT_TASKS = [{"id":1,"name":"营业执照申请","cat":"证照","owner":"店长","start":"2026-08-03","days":14,"desc":"准备材料：身份证、场地租赁合同、消防验收证明，向市场监管局提交申请。","isProcurement":false,"subtasks":[{"name":"准备身份证复印件","done":false},{"name":"准备场地租赁合同","done":false},{"name":"填写申请表格","done":false},{"name":"提交市场监管局","done":false},{"name":"领取营业执照","done":false}]},{"id":2,"name":"食品经营许可证","cat":"证照","owner":"店长","start":"2026-08-05","days":26,"desc":"需先完成营业执照，提交厨房布局图、食品安全管理制度、从业人员健康证。","isProcurement":false,"subtasks":[{"name":"绘制厨房布局图","done":false},{"name":"制定食品安全管理制度","done":false},{"name":"办理从业人员健康证","done":false},{"name":"提交申请材料","done":false},{"name":"现场核查","done":false},{"name":"领取许可证","done":false}]},{"id":3,"name":"消防验收","cat":"证照","owner":"工程部","start":"2026-08-10","days":10,"desc":"装修前需消防设计备案，装修后申请消防验收。","isProcurement":false,"subtasks":[{"name":"消防设计备案","done":false},{"name":"安装消防设备","done":false},{"name":"疏散通道验收","done":false},{"name":"灭火器配置检查","done":false},{"name":"取得消防验收合格证明","done":false}]},{"id":4,"name":"环保排污许可","cat":"证照","owner":"店长","start":"2026-08-15","days":12,"desc":"安装油烟净化器和隔油池，向环保局提交排污申请。","isProcurement":false,"subtasks":[{"name":"安装油烟净化器","done":false},{"name":"安装隔油池","done":false},{"name":"提交排污申请","done":false},{"name":"现场检查","done":false},{"name":"取得排污许可证","done":false}]},{"id":5,"name":"开业验收","cat":"证照","owner":"店长","start":"2026-09-15","days":10,"desc":"开业前最终验收，包括卫生、消防、食品安全等综合检查，确保符合开业条件。","isProcurement":false,"subtasks":[{"name":"卫生部门现场检查","done":false},{"name":"消防最终复查","done":false},{"name":"食品安全综合核查","done":false},{"name":"整改不合格项","done":false},{"name":"取得开业许可","done":false}]},{"id":6,"name":"场地设计与测量","cat":"装修","owner":"设计师","start":"2026-08-01","days":7,"desc":"量房、出平面布局图、水电点位图、效果图确认。","isProcurement":false,"subtasks":[{"name":"现场量房","done":false},{"name":"平面布局图","done":false},{"name":"水电点位图","done":false},{"name":"效果图确认","done":false}]},{"id":7,"name":"水电改造","cat":"装修","owner":"施工队","start":"2026-08-08","days":10,"desc":"厨房大功率电路、上下水、排烟管道预埋。","isProcurement":false,"subtasks":[{"name":"电路布线","done":false},{"name":"上下水安装","done":false},{"name":"排烟管道预埋","done":false},{"name":"隐蔽工程验收","done":false}]},{"id":8,"name":"厨房设备安装","cat":"装修","owner":"施工队","start":"2026-08-18","days":12,"desc":"灶台、蒸柜、烤箱、冷藏柜、排烟罩等固定设备安装。","isProcurement":false,"subtasks":[{"name":"灶台安装","done":false},{"name":"蒸柜/烤箱就位","done":false},{"name":"冷藏柜安装","done":false},{"name":"排烟罩吊装","done":false},{"name":"设备通电调试","done":false}]},{"id":9,"name":"前厅装修","cat":"装修","owner":"施工队","start":"2026-08-20","days":25,"desc":"墙面、地面、吊顶、灯光、桌椅摆放、收银台制作。","isProcurement":false,"subtasks":[{"name":"墙面处理","done":false},{"name":"地面铺装","done":false},{"name":"吊顶安装","done":false},{"name":"灯光布置","done":false},{"name":"收银台制作","done":false},{"name":"桌椅进场摆放","done":false},{"name":"软装布置","done":false}]},{"id":10,"name":"厨房设备采购","cat":"采购","owner":"采购部","start":"2026-08-01","days":20,"desc":"炉灶、蒸箱、烤箱、冰箱、洗碗机、排烟系统等大型设备下单。","isProcurement":true,"subtasks":[{"name":"商用燃气灶台","qty":"2台","budget":"¥8,000","payment":"50%预付","shipped":false,"arrived":false,"done":false},{"name":"蒸柜","qty":"1台","budget":"¥5,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"烤箱","qty":"1台","budget":"¥6,500","payment":"50%预付","shipped":false,"arrived":false,"done":false},{"name":"四门冰箱","qty":"2台","budget":"¥7,000","payment":"货到付款","shipped":false,"arrived":false,"done":false},{"name":"洗碗机","qty":"1台","budget":"¥12,000","payment":"分期","shipped":false,"arrived":false,"done":false},{"name":"排烟系统","qty":"1套","budget":"¥15,000","payment":"50%预付","shipped":false,"arrived":false,"done":false}]},{"id":11,"name":"餐具器皿采购","cat":"采购","owner":"采购部","start":"2026-08-20","days":15,"desc":"碗碟、筷子、勺子、托盘、酒杯、茶壶等。","isProcurement":true,"subtasks":[{"name":"陶瓷碗碟套装","qty":"200套","budget":"¥4,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"筷子/勺子","qty":"300双","budget":"¥1,500","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"托盘","qty":"50个","budget":"¥800","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"酒杯","qty":"100个","budget":"¥1,200","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"茶壶/茶杯","qty":"30套","budget":"¥2,000","payment":"全款","shipped":false,"arrived":false,"done":false}]},{"id":12,"name":"食材供应商签约","cat":"采购","owner":"主厨","start":"2026-08-25","days":10,"desc":"肉类、蔬菜、海鲜、粮油、调料等供应商筛选、试样、签约。","isProcurement":true,"subtasks":[{"name":"肉类供应商","qty":"3家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false},{"name":"蔬菜供应商","qty":"2家","budget":"周结","payment":"周结","shipped":false,"arrived":false,"done":false},{"name":"海鲜供应商","qty":"2家","budget":"现结","payment":"现结","shipped":false,"arrived":false,"done":false},{"name":"粮油调料供应商","qty":"1家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false}]},{"id":13,"name":"POS系统与收银设备","cat":"采购","owner":"店长","start":"2026-09-01","days":7,"desc":"点餐系统、收银机、扫码枪、小票打印机、后厨KDS屏幕安装调试。","isProcurement":true,"subtasks":[{"name":"收银机","qty":"2台","budget":"¥6,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"扫码枪","qty":"2把","budget":"¥400","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"小票打印机","qty":"3台","budget":"¥900","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"后厨KDS屏幕","qty":"2台","budget":"¥3,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"点餐系统软件","qty":"1套","budget":"¥5,000/年","payment":"年付","shipped":false,"arrived":false,"done":false}]},{"id":14,"name":"店长/主厨招聘","cat":"人员","owner":"HR","start":"2026-08-01","days":21,"desc":"发布招聘、面试、背景调查、薪酬谈判、签约。","isProcurement":false,"subtasks":[{"name":"发布招聘信息","done":false},{"name":"简历筛选","done":false},{"name":"初试","done":false},{"name":"复试/试菜","done":false},{"name":"背景调查","done":false},{"name":"Offer发放","done":false},{"name":"签约入职","done":false}]},{"id":15,"name":"厨师团队招聘","cat":"人员","owner":"主厨","start":"2026-08-15","days":20,"desc":"热菜、凉菜、面点、切配等岗位招聘，主厨亲自面试试菜。","isProcurement":false,"subtasks":[{"name":"确定编制需求","done":false},{"name":"发布招聘","done":false},{"name":"简历筛选","done":false},{"name":"面试试菜","done":false},{"name":"录用签约","done":false}]},{"id":16,"name":"服务人员招聘","cat":"人员","owner":"店长","start":"2026-08-20","days":18,"desc":"服务员、传菜员、收银员、保洁员招聘。","isProcurement":false,"subtasks":[{"name":"确定招聘人数","done":false},{"name":"发布招聘","done":false},{"name":"面试筛选","done":false},{"name":"录用通知","done":false},{"name":"办理入职","done":false}]},{"id":17,"name":"全员培训","cat":"人员","owner":"店长","start":"2026-09-10","days":14,"desc":"服务流程、菜品知识、卫生标准、应急处理、POS系统操作培训。","isProcurement":false,"subtasks":[{"name":"制定培训计划","done":false},{"name":"服务礼仪培训","done":false},{"name":"菜品知识培训","done":false},{"name":"卫生标准培训","done":false},{"name":"POS系统操作培训","done":false},{"name":"应急演练","done":false},{"name":"考核通过","done":false}]},{"id":18,"name":"品牌VI设计","cat":"营销","owner":"市场部","start":"2026-08-01","days":14,"desc":"Logo、菜单设计、外卖包装、员工制服、店面招牌设计。","isProcurement":false,"subtasks":[{"name":"Logo设计定稿","done":false},{"name":"菜单设计","done":false},{"name":"外卖包装设计","done":false},{"name":"员工制服设计","done":false},{"name":"店面招牌设计","done":false}]},{"id":19,"name":"社交媒体预热","cat":"营销","owner":"市场部","start":"2026-09-01","days":20,"desc":"小红书、抖音、大众点评账号运营，发布装修进度、菜品预告。","isProcurement":false,"subtasks":[{"name":"注册各平台账号","done":false},{"name":"拍摄装修进度视频","done":false},{"name":"菜品预告拍摄","done":false},{"name":"发布预热内容","done":false},{"name":"互动引流","done":false}]},{"id":20,"name":"开业活动策划","cat":"营销","owner":"市场部","start":"2026-09-10","days":10,"desc":"试营业优惠、开业当天活动、会员招募方案、媒体邀请。","isProcurement":false,"subtasks":[{"name":"确定活动方案","done":false},{"name":"设计宣传物料","done":false},{"name":"联系媒体/KOL","done":false},{"name":"准备开业礼品","done":false}]},{"id":21,"name":"试营业","cat":"营销","owner":"店长","start":"2026-09-20","days":10,"desc":"邀请亲友试吃，检验出餐流程、服务动线、菜品口味，收集反馈调整。","isProcurement":false,"subtasks":[{"name":"确定试营业名单","done":false},{"name":"预约通知","done":false},{"name":"试营业执行","done":false},{"name":"收集反馈","done":false},{"name":"问题整改","done":false}]}];
+const DEFAULT_TASKS = [{"id":1,"name":"营业执照申请","cat":"证照","owner":"店长","start":"2026-08-01","days":14,"desc":"准备材料：身份证、场地租赁合同、消防验收证明，向市场监管局提交申请。","isProcurement":false,"subtasks":[{"name":"准备身份证复印件","done":false},{"name":"准备场地租赁合同","done":false},{"name":"填写申请表格","done":false},{"name":"提交市场监管局","done":false},{"name":"领取营业执照","done":false}]},{"id":2,"name":"食品经营许可证","cat":"证照","owner":"店长","start":"2026-08-05","days":20,"desc":"需先完成营业执照，提交厨房布局图、食品安全管理制度、从业人员健康证。","isProcurement":false,"subtasks":[{"name":"绘制厨房布局图","done":false},{"name":"制定食品安全管理制度","done":false},{"name":"办理从业人员健康证","done":false},{"name":"提交申请材料","done":false},{"name":"现场核查","done":false},{"name":"领取许可证","done":false}]},{"id":3,"name":"消防验收","cat":"证照","owner":"工程部","start":"2026-08-10","days":10,"desc":"装修前需消防设计备案，装修后申请消防验收。","isProcurement":false,"subtasks":[{"name":"消防设计备案","done":false},{"name":"安装消防设备","done":false},{"name":"疏散通道验收","done":false},{"name":"灭火器配置检查","done":false},{"name":"取得消防验收合格证明","done":false}]},{"id":4,"name":"环保排污许可","cat":"证照","owner":"店长","start":"2026-08-15","days":12,"desc":"安装油烟净化器和隔油池，向环保局提交排污申请。","isProcurement":false,"subtasks":[{"name":"安装油烟净化器","done":false},{"name":"安装隔油池","done":false},{"name":"提交排污申请","done":false},{"name":"现场检查","done":false},{"name":"取得排污许可证","done":false}]},{"id":5,"name":"开业验收","cat":"证照","owner":"店长","start":"2026-09-15","days":10,"desc":"开业前最终验收，包括卫生、消防、食品安全等综合检查，确保符合开业条件。","isProcurement":false,"subtasks":[{"name":"卫生部门现场检查","done":false},{"name":"消防最终复查","done":false},{"name":"食品安全综合核查","done":false},{"name":"整改不合格项","done":false},{"name":"取得开业许可","done":false}]},{"id":6,"name":"场地设计与测量","cat":"装修","owner":"设计师","start":"2026-08-01","days":7,"desc":"量房、出平面布局图、水电点位图、效果图确认。","isProcurement":false,"subtasks":[{"name":"现场量房","done":false},{"name":"平面布局图","done":false},{"name":"水电点位图","done":false},{"name":"效果图确认","done":false}]},{"id":7,"name":"水电改造","cat":"装修","owner":"施工队","start":"2026-08-08","days":10,"desc":"厨房大功率电路、上下水、排烟管道预埋。","isProcurement":false,"subtasks":[{"name":"电路布线","done":false},{"name":"上下水安装","done":false},{"name":"排烟管道预埋","done":false},{"name":"隐蔽工程验收","done":false}]},{"id":8,"name":"厨房设备安装","cat":"装修","owner":"施工队","start":"2026-08-18","days":12,"desc":"灶台、蒸柜、烤箱、冷藏柜、排烟罩等固定设备安装。","isProcurement":false,"subtasks":[{"name":"灶台安装","done":false},{"name":"蒸柜/烤箱就位","done":false},{"name":"冷藏柜安装","done":false},{"name":"排烟罩吊装","done":false},{"name":"设备通电调试","done":false}]},{"id":9,"name":"前厅装修","cat":"装修","owner":"施工队","start":"2026-08-20","days":25,"desc":"墙面、地面、吊顶、灯光、桌椅摆放、收银台制作。","isProcurement":false,"subtasks":[{"name":"墙面处理","done":false},{"name":"地面铺装","done":false},{"name":"吊顶安装","done":false},{"name":"灯光布置","done":false},{"name":"收银台制作","done":false},{"name":"桌椅进场摆放","done":false},{"name":"软装布置","done":false}]},{"id":10,"name":"厨房设备采购","cat":"采购","owner":"采购部","start":"2026-08-01","days":20,"desc":"炉灶、蒸箱、烤箱、冰箱、洗碗机、排烟系统等大型设备下单。","isProcurement":true,"subtasks":[{"name":"商用燃气灶台","qty":"2台","budget":"¥8,000","payment":"50%预付","shipped":false,"arrived":false,"done":false},{"name":"蒸柜","qty":"1台","budget":"¥5,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"烤箱","qty":"1台","budget":"¥6,500","payment":"50%预付","shipped":false,"arrived":false,"done":false},{"name":"四门冰箱","qty":"2台","budget":"¥7,000","payment":"货到付款","shipped":false,"arrived":false,"done":false},{"name":"洗碗机","qty":"1台","budget":"¥12,000","payment":"分期","shipped":false,"arrived":false,"done":false},{"name":"排烟系统","qty":"1套","budget":"¥15,000","payment":"50%预付","shipped":false,"arrived":false,"done":false}]},{"id":11,"name":"餐具器皿采购","cat":"采购","owner":"采购部","start":"2026-08-20","days":15,"desc":"碗碟、筷子、勺子、托盘、酒杯、茶壶等。","isProcurement":true,"subtasks":[{"name":"陶瓷碗碟套装","qty":"200套","budget":"¥4,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"筷子/勺子","qty":"300双","budget":"¥1,500","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"托盘","qty":"50个","budget":"¥800","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"酒杯","qty":"100个","budget":"¥1,200","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"茶壶/茶杯","qty":"30套","budget":"¥2,000","payment":"全款","shipped":false,"arrived":false,"done":false}]},{"id":12,"name":"食材供应商签约","cat":"采购","owner":"主厨","start":"2026-08-25","days":10,"desc":"肉类、蔬菜、海鲜、粮油、调料等供应商筛选、试样、签约。","isProcurement":true,"subtasks":[{"name":"肉类供应商","qty":"3家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false},{"name":"蔬菜供应商","qty":"2家","budget":"周结","payment":"周结","shipped":false,"arrived":false,"done":false},{"name":"海鲜供应商","qty":"2家","budget":"现结","payment":"现结","shipped":false,"arrived":false,"done":false},{"name":"粮油调料供应商","qty":"1家","budget":"月结","payment":"月结","shipped":false,"arrived":false,"done":false}]},{"id":13,"name":"POS系统与收银设备","cat":"采购","owner":"店长","start":"2026-09-01","days":7,"desc":"点餐系统、收银机、扫码枪、小票打印机、后厨KDS屏幕安装调试。","isProcurement":true,"subtasks":[{"name":"收银机","qty":"2台","budget":"¥6,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"扫码枪","qty":"2把","budget":"¥400","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"小票打印机","qty":"3台","budget":"¥900","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"后厨KDS屏幕","qty":"2台","budget":"¥3,000","payment":"全款","shipped":false,"arrived":false,"done":false},{"name":"点餐系统软件","qty":"1套","budget":"¥5,000/年","payment":"年付","shipped":false,"arrived":false,"done":false}]},{"id":14,"name":"店长/主厨招聘","cat":"人员","owner":"HR","start":"2026-08-01","days":21,"desc":"发布招聘、面试、背景调查、薪酬谈判、签约。","isProcurement":false,"subtasks":[{"name":"发布招聘信息","done":false},{"name":"简历筛选","done":false},{"name":"初试","done":false},{"name":"复试/试菜","done":false},{"name":"背景调查","done":false},{"name":"Offer发放","done":false},{"name":"签约入职","done":false}]},{"id":15,"name":"厨师团队招聘","cat":"人员","owner":"主厨","start":"2026-08-15","days":20,"desc":"热菜、凉菜、面点、切配等岗位招聘，主厨亲自面试试菜。","isProcurement":false,"subtasks":[{"name":"确定编制需求","done":false},{"name":"发布招聘","done":false},{"name":"简历筛选","done":false},{"name":"面试试菜","done":false},{"name":"录用签约","done":false}]},{"id":16,"name":"服务人员招聘","cat":"人员","owner":"店长","start":"2026-08-20","days":18,"desc":"服务员、传菜员、收银员、保洁员招聘。","isProcurement":false,"subtasks":[{"name":"确定招聘人数","done":false},{"name":"发布招聘","done":false},{"name":"面试筛选","done":false},{"name":"录用通知","done":false},{"name":"办理入职","done":false}]},{"id":17,"name":"全员培训","cat":"人员","owner":"店长","start":"2026-09-10","days":14,"desc":"服务流程、菜品知识、卫生标准、应急处理、POS系统操作培训。","isProcurement":false,"subtasks":[{"name":"制定培训计划","done":false},{"name":"服务礼仪培训","done":false},{"name":"菜品知识培训","done":false},{"name":"卫生标准培训","done":false},{"name":"POS系统操作培训","done":false},{"name":"应急演练","done":false},{"name":"考核通过","done":false}]},{"id":18,"name":"品牌VI设计","cat":"营销","owner":"市场部","start":"2026-08-01","days":14,"desc":"Logo、菜单设计、外卖包装、员工制服、店面招牌设计。","isProcurement":false,"subtasks":[{"name":"Logo设计定稿","done":false},{"name":"菜单设计","done":false},{"name":"外卖包装设计","done":false},{"name":"员工制服设计","done":false},{"name":"店面招牌设计","done":false}]},{"id":19,"name":"社交媒体预热","cat":"营销","owner":"市场部","start":"2026-09-01","days":20,"desc":"小红书、抖音、大众点评账号运营，发布装修进度、菜品预告。","isProcurement":false,"subtasks":[{"name":"注册各平台账号","done":false},{"name":"拍摄装修进度视频","done":false},{"name":"菜品预告拍摄","done":false},{"name":"发布预热内容","done":false},{"name":"互动引流","done":false}]},{"id":20,"name":"开业活动策划","cat":"营销","owner":"市场部","start":"2026-09-10","days":10,"desc":"试营业优惠、开业当天活动、会员招募方案、媒体邀请。","isProcurement":false,"subtasks":[{"name":"确定活动方案","done":false},{"name":"设计宣传物料","done":false},{"name":"联系媒体/KOL","done":false},{"name":"准备开业礼品","done":false}]},{"id":21,"name":"试营业","cat":"营销","owner":"店长","start":"2026-09-20","days":10,"desc":"邀请亲友试吃，检验出餐流程、服务动线、菜品口味，收集反馈调整。","isProcurement":false,"subtasks":[{"name":"确定试营业名单","done":false},{"name":"预约通知","done":false},{"name":"试营业执行","done":false},{"name":"收集反馈","done":false},{"name":"问题整改","done":false}]}];
 
 let tasks = [];
 let expandedIds = new Set();
@@ -330,15 +438,7 @@ function togglePasswordVisibility() {
     btn.textContent = '👁';
   }
 }
-// 回车解锁
-document.addEventListener('DOMContentLoaded', function() {
-  const lockInput = document.getElementById('lockPassword');
-  if (lockInput) {
-    lockInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') unlock();
-    });
-  }
-});
+
 
 // ===== 拖拽状态 =====
 let isDragging = false;
@@ -429,18 +529,29 @@ function loadSettings() {
     document.getElementById('ghBranch').value = s.branch || 'main';
     document.getElementById('ghPath').value = s.path || 'index.html';
     document.getElementById('pagePassword').value = s.pagePassword || '';
-    if (s.openingDate) {
-      OPENING_DATE = new Date(s.openingDate);
-      document.getElementById('openingDateInput').value = s.openingDate;
-    } else {
-      document.getElementById('openingDateInput').value = '2026-10-01';
+    if (currentStoreId) {
+      const store = stores.find(function(s2) { return s2.id === currentStoreId; });
+      if (store) {
+        OPENING_DATE = new Date(store.openingDate);
+        document.getElementById('openingDateInput').value = store.openingDate;
+      }
     }
   } catch(e) {}
 }
 function saveSettings() {
   const openingDateVal = document.getElementById('openingDateInput').value;
-  if (openingDateVal) {
+  if (openingDateVal && currentStoreId) {
     OPENING_DATE = new Date(openingDateVal);
+    const store = stores.find(function(s) { return s.id === currentStoreId; });
+    if (store) {
+      const oldDate = store.openingDate;
+      store.openingDate = openingDateVal;
+      const dayDiff = getDaysDiff(oldDate, openingDateVal);
+      if (dayDiff !== 0 && tasks) {
+        tasks.forEach(function(t) { t.start = addDays(t.start, dayDiff); });
+      }
+      saveMultiStoreData();
+    }
   }
   const settings = {
     token: document.getElementById('ghToken').value.trim(),
@@ -448,7 +559,6 @@ function saveSettings() {
     repo: document.getElementById('ghRepo').value.trim(),
     branch: document.getElementById('ghBranch').value.trim(),
     path: document.getElementById('ghPath').value.trim(),
-    openingDate: openingDateVal,
     pagePassword: document.getElementById('pagePassword').value.trim()
   };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -525,35 +635,43 @@ ${document.documentElement.innerHTML}
   const oldJson = JSON.stringify(DEFAULT_TASKS);
   const newJson = JSON.stringify(tasks);
   html = html.replace(oldJson, newJson);
-  const oldDate = "const OPENING_DATE = new Date('2026-12-01');";
-  const newDate = "const OPENING_DATE = new Date('" + OPENING_DATE.toISOString().split('T')[0] + "');";
-  html = html.replace(oldDate, newDate);
   return html;
 }
 
 function loadData() {
+  if (!currentStoreId) return;
+  const store = stores.find(function(s) { return s.id === currentStoreId; });
+  if (!store) return;
+  tasks = store.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  if (store.expandedIds) expandedIds = new Set(store.expandedIds);
+  else expandedIds = new Set();
+  OPENING_DATE = new Date(store.openingDate);
+  START_DATE = new Date(addDays(store.openingDate, -60));
+}
+
+function loadMultiStoreData() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(MULTI_STORE_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.tasks && Array.isArray(parsed.tasks)) {
-        tasks = parsed.tasks;
-        if (parsed.expandedIds) expandedIds = new Set(parsed.expandedIds);
-        if (parsed.openingDate) OPENING_DATE = new Date(parsed.openingDate);
-        return;
-      }
+      stores = JSON.parse(saved);
+      if (!Array.isArray(stores)) stores = [];
     }
-  } catch (e) {}
-  tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  } catch (e) { stores = []; }
+}
+
+function saveMultiStoreData() {
+  localStorage.setItem(MULTI_STORE_KEY, JSON.stringify(stores));
 }
 function saveData() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      tasks: tasks,
-      expandedIds: Array.from(expandedIds),
-      openingDate: OPENING_DATE.toISOString().split('T')[0],
-      savedAt: new Date().toISOString()
-    }));
+    const store = stores.find(function(s) { return s.id === currentStoreId; });
+    if (store) {
+      store.tasks = tasks;
+      store.expandedIds = Array.from(expandedIds);
+      store.openingDate = OPENING_DATE.toISOString().split('T')[0];
+      store.savedAt = new Date().toISOString();
+      saveMultiStoreData();
+    }
   } catch (e) {}
 }
 function showToast(msg) {
@@ -563,134 +681,28 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 function resetData() {
-  if (confirm('确定重置所有数据到初始状态吗？当前修改将丢失。')) {
-    localStorage.removeItem(STORAGE_KEY);
-    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-    expandedIds = new Set();
-    activeTaskId = null;
-    render();
-    showToast('数据已重置');
+  if (confirm('确定重置该门店所有任务到初始状态吗？当前修改将丢失。')) {
+    const store = stores.find(function(s) { return s.id === currentStoreId; });
+    if (store) {
+      store.tasks = initDefaultTasks(store.openingDate);
+      store.expandedIds = [];
+      saveMultiStoreData();
+      loadData();
+      render();
+      showToast('数据已重置');
+    }
   }
 }
-async function exportExcel() {
-  // 动态加载 html2canvas（如果尚未加载）
-  if (typeof html2canvas === 'undefined') {
-    showToast('正在加载截图组件，请稍候...');
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    script.onload = function() { exportExcel(); };
-    script.onerror = function() { showToast('加载失败，请检查网络'); };
-    document.head.appendChild(script);
-    return;
-  }
-
-  showToast('正在生成 Excel，请稍候...');
-  const btn = document.querySelector('button[onclick="exportExcel()"]');
-  if (btn) { btn.disabled = true; btn.textContent = '生成中...'; }
-
-  try {
-    // 临时展开所有任务以确保完整截图
-    const prevExpanded = new Set(expandedIds);
-    expandedIds = new Set(tasks.map(function(t) { return t.id; }));
-    render();
-
-    // 等待渲染完成
-    await new Promise(function(r) { setTimeout(r, 300); });
-
-    const chartArea = document.getElementById('chart-area');
-    const canvas = await html2canvas(chartArea, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      scrollX: 0,
-      scrollY: -chartArea.scrollTop,
-      windowWidth: document.getElementById('chart-rows').scrollWidth + 40,
-      windowHeight: chartArea.scrollHeight + 40
-    });
-
-    // 恢复展开状态
-    expandedIds = prevExpanded;
-    render();
-
-    const imgData = canvas.toDataURL('image/png');
-
-    // 构建 Excel 兼容的 HTML
-    let html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  body { font-family: "Microsoft YaHei", Arial, sans-serif; padding: 20px; }
-  h2 { color: #333; margin-bottom: 8px; }
-  .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
-  table { border-collapse: collapse; width: 100%; margin-bottom: 24px; }
-  th, td { border: 1px solid #bbb; padding: 8px 10px; text-align: left; font-size: 12px; vertical-align: top; }
-  th { background: #f0f0f0; font-weight: bold; }
-  tr:nth-child(even) { background: #fafafa; }
-  .cat-证照 { background: #e3f2fd !important; }
-  .cat-装修 { background: #ffebee !important; }
-  .cat-采购 { background: #e8f5e9 !important; }
-  .cat-人员 { background: #f3e5f5 !important; }
-  .cat-营销 { background: #fafafa !important; }
-  .progress-0 { color: #999; }
-  .progress-100 { color: #43a047; font-weight: bold; }
-  img { max-width: 100%; height: auto; border: 1px solid #ddd; }
-  .footer { margin-top: 20px; font-size: 11px; color: #999; }
-</style>
-</head>
-<body>
-<h2>餐厅开业筹备甘特图</h2>
-<div class="meta">目标开业日：` + OPENING_DATE.toISOString().split('T')[0] + ` | 导出时间：` + new Date().toLocaleString('zh-CN') + `</div>
-
-<table>
-<tr>
-  <th>ID</th><th>任务名称</th><th>分类</th><th>负责人</th>
-  <th>开始日期</th><th>持续天数</th><th>结束日期</th><th>进度</th><th>状态</th><th>描述</th>
-</tr>`;
-
-    for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i];
-      const progress = computeProgress(task);
-      const status = computeStatus(task);
-      const end = addDays(task.start, task.days);
-      const progressClass = progress === 0 ? 'progress-0' : (progress === 100 ? 'progress-100' : '');
-      html += '<tr class="cat-' + task.cat + '">' +
-        '<td>' + task.id + '</td>' +
-        '<td>' + task.name + '</td>' +
-        '<td>' + task.cat + '</td>' +
-        '<td>' + task.owner + '</td>' +
-        '<td>' + task.start + '</td>' +
-        '<td>' + task.days + '</td>' +
-        '<td>' + end + '</td>' +
-        '<td class="' + progressClass + '">' + progress + '%</td>' +
-        '<td>' + status + '</td>' +
-        '<td>' + task.desc + '</td>' +
-        '</tr>';
-    }
-
-    html += `</table>
-
-<h3>甘特图</h3>
-<img src="` + imgData + `" alt="甘特图">
-
-<div class="footer">由 餐厅开业筹备甘特图 自动生成</div>
-</body>
-</html>`;
-
-    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '餐厅开业甘特图_' + new Date().toISOString().slice(0,10) + '.xls';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Excel 导出成功！');
-  } catch (err) {
-    console.error(err);
-    showToast('导出失败: ' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '📊 导出Excel'; }
-  }
+function exportHTML() {
+  const html = buildExportHTML();
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'restaurant_opening_gantt_' + new Date().toISOString().slice(0,10) + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已导出HTML文件');
 }
 
 function getDaysDiff(d1, d2) {
@@ -1138,17 +1150,212 @@ function closeDetail() {
   render();
 }
 
-// 初始化：检查是否已解锁
-if (checkLocked()) {
-  document.getElementById('appWrapper').classList.add('locked');
-} else {
-  document.getElementById('lockScreen').classList.add('hidden');
+// ===== Multi-store functions =====
+function generateId() { return Date.now() + Math.random().toString(36).slice(2,9); }
+function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+function getDaysDiff(d1,d2) { return Math.round((new Date(d2)-new Date(d1))/(1000*60*60*24)); }
+function addDays(dateStr,days) { const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().split('T')[0]; }
+
+function initDefaultTasks(openingDate) {
+  var baseDate = addDays(openingDate, -60);
+  return JSON.parse(JSON.stringify(DEFAULT_TASKS)).map(function(t) {
+    var offset = getDaysDiff(START_DATE.toISOString().split('T')[0], t.start);
+    t.start = addDays(baseDate, offset);
+    return t;
+  });
 }
 
-loadSettings();
-loadData();
-render();
-</script>
+function computeStoreProgress(store) {
+  if (!store.tasks || store.tasks.length===0) return 0;
+  var total=0, done=0;
+  store.tasks.forEach(function(t){
+    if (t.subtasks) {
+      t.subtasks.forEach(function(s){
+        total++;
+        if (typeof s==='object' && s.done) done++;
+      });
+    }
+  });
+  return total===0?0:Math.round((done/total)*100);
+}
 
+function getDaysToOpen(store) {
+  return getDaysDiff(getTodayStr(), store.openingDate);
+}
+
+function getStoreStatus(store) {
+  var days = getDaysToOpen(store);
+  var progress = computeStoreProgress(store);
+  if (days < 0) return {cls:'status-done', text:'已开业'};
+  if (days <= 7) return {cls:'status-soon', text:'即将开业'};
+  if (progress >= 80) return {cls:'status-ok', text:'筹备顺利'};
+  if (days <= 30 && progress < 50) return {cls:'status-danger', text:'进度滞后'};
+  return {cls:'status-normal', text:'筹备中'};
+}
+
+// ===== Dashboard rendering =====
+function renderDashboard() {
+  var grid = document.getElementById('storeGrid');
+  var empty = document.getElementById('dbEmpty');
+  var stats = document.getElementById('dbStats');
+
+  var total = stores.length;
+  var opened = stores.filter(function(s){return getDaysToOpen(s)<0;}).length;
+  var upcoming = stores.filter(function(s){var d=getDaysToOpen(s);return d>=0&&d<=7;}).length;
+  var avgProgress = total===0?0:Math.round(stores.reduce(function(a,s){return a+computeStoreProgress(s);},0)/total);
+
+  stats.innerHTML = '<div class="db-stat"><div class="db-stat-v">' + total + '</div><div class="db-stat-l">总门店数</div></div>' +
+    '<div class="db-stat"><div class="db-stat-v">' + opened + '</div><div class="db-stat-l">已开业</div></div>' +
+    '<div class="db-stat"><div class="db-stat-v">' + upcoming + '</div><div class="db-stat-l">即将开业</div></div>' +
+    '<div class="db-stat"><div class="db-stat-v">' + avgProgress + '%</div><div class="db-stat-l">平均进度</div></div>';
+
+  if (stores.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = stores.map(function(store) {
+    var progress = computeStoreProgress(store);
+    var daysToOpen = getDaysToOpen(store);
+    var status = getStoreStatus(store);
+    var barColor = progress>=80?'var(--kimi-color-positive)':progress>=50?'var(--kimi-color-accent)':'var(--kimi-color-warning)';
+
+    return '<div class="store-card" onclick="openStoreGantt(&quot;' + store.id + '&quot;)">' +
+      '<div class="store-actions" onclick="event.stopPropagation()">' +
+      '<button class="s-icon-btn" onclick="editStore(&quot;' + store.id + '&quot;)" title="编辑">✎</button>' +
+      '<button class="s-icon-btn" onclick="deleteStore(&quot;' + store.id + '&quot;)" title="删除">🗑</button>' +
+      '</div>' +
+      '<div class="s-name">' + store.name + '</div>' +
+      '<span class="s-status ' + status.cls + '">' + status.text + '</span>' +
+      '<div class="s-meta">' +
+      '<span>📍 ' + (store.address||'未设置') + '</span>' +
+      '<span>👤 ' + (store.manager||'未分配') + '</span>' +
+      '</div>' +
+      '<div class="s-meta">' +
+      '<span>📅 ' + store.openingDate + '</span>' +
+      '<span>⏰ ' + (daysToOpen>=0?'倒计时 '+daysToOpen+' 天':'已开业 '+Math.abs(daysToOpen)+' 天') + '</span>' +
+      '</div>' +
+      '<div class="s-progress"><div class="s-progress-fill" style="width:' + progress + '%;background:' + barColor + '"></div></div>' +
+      '<div class="s-progress-label"><span>整体进度</span><span>' + progress + '%</span></div>' +
+      '</div>';
+  }).join('');
+}
+
+function openStoreModal(id) {
+  editingStoreId = id || null;
+  document.getElementById('storeModalTitle').textContent = id ? '编辑门店' : '添加门店';
+  if (id) {
+    var s = stores.find(function(x){return x.id===id;});
+    document.getElementById('storeName').value = s.name;
+    document.getElementById('storeAddress').value = s.address||'';
+    document.getElementById('storeOpeningDate').value = s.openingDate;
+    document.getElementById('storeManager').value = s.manager||'';
+  } else {
+    document.getElementById('storeName').value = '';
+    document.getElementById('storeAddress').value = '';
+    document.getElementById('storeOpeningDate').value = addDays(getTodayStr(), 60);
+    document.getElementById('storeManager').value = '';
+  }
+  document.getElementById('storeModalOverlay').classList.add('open');
+}
+function closeStoreModal() {
+  document.getElementById('storeModalOverlay').classList.remove('open');
+  editingStoreId = null;
+}
+
+function saveStore() {
+  var name = document.getElementById('storeName').value.trim();
+  var address = document.getElementById('storeAddress').value.trim();
+  var openingDate = document.getElementById('storeOpeningDate').value;
+  var manager = document.getElementById('storeManager').value.trim();
+  if (!name) { alert('请输入门店名称'); return; }
+  if (!openingDate) { alert('请选择开业日期'); return; }
+
+  if (editingStoreId) {
+    var s = stores.find(function(x){return x.id===editingStoreId;});
+    var oldDate = s.openingDate;
+    s.name = name; s.address = address; s.openingDate = openingDate; s.manager = manager;
+    if (oldDate !== openingDate && s.tasks) {
+      var dayDiff = getDaysDiff(oldDate, openingDate);
+      s.tasks.forEach(function(t){t.start = addDays(t.start, dayDiff);});
+    }
+  } else {
+    stores.push({
+      id: generateId(), name: name, address: address, openingDate: openingDate, manager: manager,
+      tasks: initDefaultTasks(openingDate), createdAt: new Date().toISOString()
+    });
+  }
+  saveMultiStoreData();
+  closeStoreModal();
+  renderDashboard();
+}
+
+function editStore(id) { openStoreModal(id); }
+function deleteStore(id) {
+  if (!confirm('确定删除该门店？所有数据将丢失。')) return;
+  stores = stores.filter(function(s){return s.id!==id;});
+  saveMultiStoreData();
+  renderDashboard();
+}
+
+function openStoreGantt(id) {
+  currentStoreId = id;
+  var store = stores.find(function(s){return s.id===id;});
+  if (!store) return;
+
+  document.getElementById('dashboardView').style.display = 'none';
+  document.getElementById('ganttDetailView').style.display = 'block';
+  document.getElementById('ganttStoreName').textContent = store.name;
+  document.getElementById('ganttStoreMeta').textContent = '📍 ' + (store.address||'未设置') + ' | 👤 ' + (store.manager||'未分配') + ' | 📅 ' + store.openingDate;
+
+  START_DATE = new Date(addDays(store.openingDate, -60));
+  loadData();
+  loadSettings();
+  render();
+}
+
+function backToDashboard() {
+  currentStoreId = null;
+  document.getElementById('ganttDetailView').style.display = 'none';
+  document.getElementById('dashboardView').style.display = 'block';
+  renderDashboard();
+}
+
+function exportAllData() {
+  var data = JSON.stringify(stores, null, 2);
+  var blob = new Blob([data], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'stores_opening_' + getTodayStr() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported) && confirm('导入 ' + imported.length + ' 家门店？当前 ' + stores.length + ' 家门店将被覆盖。')) {
+        stores = imported;
+        saveMultiStoreData();
+        renderDashboard();
+        alert('导入成功！');
+      }
+    } catch(err) { alert('导入失败：' + err.message); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ===== Init =====
+loadMultiStoreData();
+renderDashboard();
+</script>
 </body>
 </html>
