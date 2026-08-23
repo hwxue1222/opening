@@ -723,9 +723,12 @@ function getDaysDiff(d1, d2) {
   return Math.round((new Date(d2) - new Date(d1)) / (1000 * 60 * 60 * 24));
 }
 function addDays(dateStr, days) {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
+  var parts = dateStr.split('-');
+  var y = parseInt(parts[0], 10);
+  var m = parseInt(parts[1], 10) - 1;
+  var d = parseInt(parts[2], 10) + days;
+  var date = new Date(Date.UTC(y, m, d));
+  return date.toISOString().split('T')[0];
 }
 function getTotalDays() {
   return getDaysDiff(START_DATE, OPENING_DATE) + 5;
@@ -1168,7 +1171,6 @@ function closeDetail() {
 function generateId() { return Date.now() + Math.random().toString(36).slice(2,9); }
 function getTodayStr() { return new Date().toISOString().split('T')[0]; }
 function getDaysDiff(d1,d2) { return Math.round((new Date(d2)-new Date(d1))/(1000*60*60*24)); }
-function addDays(dateStr,days) { const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().split('T')[0]; }
 
 function initDefaultTasks(openingDate) {
   var baseDate = addDays(openingDate, -60);
